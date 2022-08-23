@@ -12,7 +12,6 @@ CREATE TABLE perfil (
 -- Manter sincronizado com enums/perfil.ts e models/perfil.ts
 INSERT INTO perfil (id, nome) VALUES (1, 'Administrador'), (2, 'Professor'), (3, 'Aluno');
 
--- DROP TABLE IF EXISTS usuario;
 CREATE TABLE usuario (
   id int NOT NULL AUTO_INCREMENT,
   email varchar(100) NOT NULL,
@@ -31,16 +30,43 @@ CREATE TABLE usuario (
 
 INSERT INTO usuario (email, nome, idperfil, senha, token, criacao) VALUES ('admin@portalsistemax.com.br', 'Administrador', 1, 'NsSzgX9AXd2G85aiCOrUwAFkiEHrHYljYWpJBCfqOvKr:WD+jsEW/Dswcivs42EZBZREfm+4WaPcZHRPG5LJpD8yr', NULL, NOW());
 
--- DROP TABLE IF EXISTS projeto;
-CREATE TABLE projeto (
-  id int NOT NULL,
-  idusuario int NOT NULL,
+CREATE TABLE escola (
+  id int NOT NULL AUTO_INCREMENT,
   nome varchar(100) NOT NULL,
-  apelido varchar(100) NOT NULL,
-  aprovado tinyint NOT NULL,
+  email varchar(100) NOT NULL,
+  contato varchar(100) NOT NULL,
+  exclusao datetime NULL,
   criacao datetime NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE KEY projeto_nome_UN (nome),
-  KEY projeto_idusuario_FK_IX (idusuario),
-  CONSTRAINT projeto_idusuario_FK FOREIGN KEY (idusuario) REFERENCES usuario (id) ON DELETE CASCADE ON UPDATE RESTRICT
+  UNIQUE KEY escola_nome_UN (nome),
+  KEY escola_exclusao_IX (exclusao)
+);
+
+CREATE TABLE turma (
+  id int NOT NULL AUTO_INCREMENT,
+  idescola int NOT NULL,
+  ano smallint NOT NULL,
+  serie smallint NOT NULL,
+  nome varchar(100) NOT NULL,
+  sala varchar(100) NOT NULL,
+  exclusao datetime NULL,
+  criacao datetime NOT NULL,
+  PRIMARY KEY (id),
+  KEY turma_ano_idescola_exclusao_IX (ano, idescola, exclusao),
+  KEY turma_ano_exclusao_IX (ano, exclusao),
+  KEY turma_idescola_exclusao_IX (idescola, exclusao),
+  KEY turma_exclusao_IX (exclusao),
+  CONSTRAINT turma_idescola_FK FOREIGN KEY (idescola) REFERENCES escola (id) ON DELETE RESTRICT ON UPDATE RESTRICT
+);
+
+CREATE TABLE turma_usuario (
+  id int NOT NULL AUTO_INCREMENT,
+  idturma int NOT NULL,
+  idusuario int NOT NULL,
+  professor tinyint NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY turma_usuario_idturma_idusuario_UN (idturma, idusuario),
+  KEY turma_usuario_idusuario_IX (idusuario),
+  CONSTRAINT turma_usuario_idturma_FK FOREIGN KEY (idturma) REFERENCES turma (id) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT turma_usuario_idusuario_FK FOREIGN KEY (idusuario) REFERENCES usuario (id) ON DELETE CASCADE ON UPDATE RESTRICT
 );

@@ -27,6 +27,19 @@
 			</div>
 		</div>
 	</li>
+
+	<li class="nav-item">
+		<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTurmas" aria-expanded="true" aria-controls="collapseTurmas">
+			<i class="fas fa-fw fa-users"></i>
+			<span>Turmas</span>
+		</a>
+		<div id="collapseTurmas" class="collapse" data-parent="#accordionSidebar">
+			<div class="bg-white py-2 collapse-inner rounded">
+				<a class="collapse-item" href="<%- root %>/turma/criar">Criar</a>
+				<a class="collapse-item" href="<%- root %>/turma/listar">Gerenciar</a>
+			</div>
+		</div>
+	</li>
 	<% } %>
 
 	<hr class="sidebar-divider">

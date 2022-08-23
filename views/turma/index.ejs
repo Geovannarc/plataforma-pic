@@ -1,0 +1,53 @@
+﻿<%
+	let cores = [
+		"primary",
+		"secondary",
+		"success",
+		"info",
+		"warning",
+		"danger",
+		"dark"
+	];
+%>
+
+<% if (!lista.length) { %>
+<p class="text-center">Você ainda não tem disciplinas atribuídas. 😢</p>
+<% } else { %>
+
+<div class="row">
+
+<% for (let i = 0; i < lista.length; i++) { const cor = cores[i % 7], disciplina = lista[i]; %>
+
+<div class="col-xl-4 col-md-6 mb-4">
+	<div class="card border-left-<%- cor %> shadow h-100 py-2">
+		<div class="card-body">
+			<div class="row no-gutters align-items-center">
+				<div class="col mr-2">
+					<div class="text-xs font-weight-bold text-<%- cor %> text-uppercase mb-1"><%- disciplina.ano %>-<%- disciplina.semestre %> / <%= disciplina.turma %></div>
+					<div class="h5 mb-0 font-weight-bold text-gray-800"><%= disciplina.idsecao %> - <%= disciplina.nome %></div>
+				</div>
+				<div class="col-auto">
+					<i class="fas fa-book fa-2x text-gray-300"></i>
+				</div>
+			</div>
+
+			<hr />
+
+			<% if (disciplina.ancora) { %>
+			<div class="mb-3 font-weight-bold text-<%- cor %>">Gerente</div>
+
+			<div class="mb-3">
+				<a href="<%- root %>/disciplina/verificacao?id=<%- disciplina.id %>" class="btn btn-sm btn-<%- cor %>"><i class="fa fa-fw fa-user-check"></i> Verificação de Presença</a>
+			</div>
+			<% } %>
+
+			<a href="<%- root %>/disciplina/presenca?id=<%- disciplina.id %>" class="btn btn-sm btn-outline-<%- cor %>"><i class="fa fa-fw fa-calendar-check"></i> Consultar Presenças</a>
+		</div>
+	</div>
+</div>
+
+<% } %>
+
+</div>
+
+<% } %>

@@ -177,6 +177,16 @@ class Usuario {
 		return (lista || []);
 	}
 
+	public static async listarCombo(): Promise<Usuario[]> {
+		let lista: Usuario[] = null;
+
+		await app.sql.connect(async (sql) => {
+			lista = await sql.query("select id, nome from usuario order by nome asc") as Usuario[];
+		});
+
+		return (lista || []);
+	}
+
 	public static async obter(id: number): Promise<Usuario> {
 		let lista: Usuario[] = null;
 
