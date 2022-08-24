@@ -12,6 +12,14 @@ interface Escola {
 }
 
 class Escola {
+
+	public static listarDeEscola(id: number): Promise<Escola[]> {
+		return app.sql.connect(async (sql) => {
+			// @@@
+			return (await sql.query("select id, nome, email, contato, criacao from escola where id = ? and exclusao is null order by criacao desc;", [id])) || [];
+		});
+	}
+
 	private static validar(escola: Escola): string {
 		if (!escola)
 			return "Dados inválidos";
@@ -34,9 +42,13 @@ class Escola {
 	}
 
 	public static async listar(): Promise<Escola[]> {
-		return app.sql.connect(async (sql) => {
-			return (await sql.query("select id, nome, email, contato, date_format(criacao, '%d/%m/%Y') criacao from escola")) || [];
+		let lista: Escola[] = null;
+
+		await app.sql.connect(async (sql) => {
+			lista = await sql.query("select id, nome, email, contato, date_format(criacao, '%d/%m/%Y') criacao, date_format(exclusao, '%d/%m/%Y') exclusao from escola") ;
 		});
+
+		return (lista || []);
 	}
 
 	public static async listarCombo(): Promise<Escola[]> {
@@ -44,6 +56,17 @@ class Escola {
 			return (await sql.query("select id, nome from escola order by nome asc")) || [];
 		});
 	}
+
+	public static obter(id: number): Promise<Escola> {
+		return app.sql.connect(async (sql) => {
+			const lista: Escola[] = await sql.query("select id, nome, contato, email, criacao, exclusao from escola where id = ? and exclusao is null", [id]);
+
+			const escola = (lista && lista[0]) || null;
+
+			return escola;
+		});
+	}
+
 
 	public static async criar(escola: Escola): Promise<string | null> {
 		const res = Escola.validar(escola);
@@ -70,21 +93,25 @@ class Escola {
 		});
 	}
 
-	public static async editar(sql: app.Sql, escola: Escola): Promise<string> {
+	public static async editar(escola: Escola): Promise<string> {
 		const res = Escola.validar(escola);
 		if (res)
 			return res;
 
 		return app.sql.connect(async (sql) => {
 			try {
-				await sql.query("update escola set nome = ?, email = ?, contato = ? where id = ?", [escola.nome, escola.email, escola.contato, escola.id]);
+				await sql.beginTransaction();
 
-				return (sql.affectedRows ? null : "Escola não encontrada");
+				await sql.query("update escola set nome = ?, contato = ?, email = ? where id = ? and exclusao is null", [escola.nome, escola.contato, escola.email, escola.id]);
+
+				if (!sql.affectedRows)
+					return "Escola não encontrada";
 			} catch (e) {
 				if (e.code) {
 					switch (e.code) {
-						case "ER_DUP_ENTRY":
-							return "Já existe uma escola com este nome";
+						case "ER_NO_REFERENCED_ROW":
+						case "ER_NO_REFERENCED_ROW_2":
+							return "Escola não encontrada";
 						default:
 							throw e;
 					}

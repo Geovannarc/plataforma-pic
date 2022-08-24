@@ -1,0 +1,118 @@
+﻿<input type="hidden" id="id" name="id" value="<%=(item ? item.id : 0) %>" />
+
+<div class="row">
+	<div class="col-sm-6">
+		<div class="form-group">
+			<label for="nome">Nome</label>
+			<input id="nome" name="nome" class="form-control" type="text" maxlength="100" value="<%=(item ? item.nome : "") %>" />
+		</div>
+	</div>
+
+	<div class="col-sm-6">
+		<div class="form-group">
+			<label for="contato">Contato</label>
+			<input id="contato" name="contato" class="form-control" type="text" maxlength="100" value="<%=(item ? item.contato : "") %>" />
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-sm-12">
+		<div class="form-group">
+			<label for="email">E-mail</label>
+			<input id="email" name="email" class="form-control" type="text" maxlength="100" value="<%=(item ? item.email : "") %>" />
+		</div>
+	</div>
+</div>
+
+<%- contentFor("styles") %>
+<style class="text/css">
+	.professor {
+		width: 7rem;
+		max-width: 7rem;
+	}
+</style>
+
+<%- contentFor("scripts") %>
+<script type="text/javascript">
+	//<![CDATA[
+	"use strict";
+
+	prepareCbSearch(document.getElementById("idusuario"));
+	prepareCbSearch(document.getElementById("idescola"));
+
+	function adicionarUsuario() {
+		if (JsonWebApi.active)
+			return;
+
+		const id = parseInt($("#idusuario").val());
+
+		if (!id)
+			return;
+
+		$("#tabelabody").append(`<tr>
+			<td>
+				<button title="Excluir" type="button" onclick="removerUsuario(this)" class="btn btn-sm btn-outline-danger"><i class="fa fa-fw fa-times"></i></button>
+				<input type="hidden" name="idsusuario" value="${id}" />
+			</td>
+			<td>
+				${$("#idusuario option:selected").html()}
+			</td>
+			<td class="col-min">
+				<select class="form-control professor" name="professores">
+					<option value="0"></option>
+					<option value="1">Professor</option>
+				</select>
+			</td>
+		</tr>`);
+	}
+
+	function removerUsuario(btn) {
+		if (JsonWebApi.active)
+			return;
+
+		$(btn.parentNode.parentNode).remove();
+	}
+
+	$("#form").validate({
+		rules: {
+			idescola: {
+				required: true
+			},
+			nome: {
+				required: true
+			}
+		},
+
+		submitHandler: function (form) {
+			if (JsonWebApi.active)
+				return;
+
+			Swal.wait();
+
+			//<% if (item) { %>
+
+			JsonWebApi.postFormData("<%- root %>/api/escola/editar", form, function (response) {
+				if (response.success)
+					Swal.success("escola alterada com sucesso! " + emoji.happy);
+				else
+					Swal.error(response.value + " " + emoji.sad);
+			});
+
+			//<% } else { %>
+
+			JsonWebApi.postFormData("<%- root %>/api/escola/criar", form, function (response) {
+				if (response.success) {
+					resetForm("#form");
+					$("#tabelabody").empty();
+					Swal.success("escola criada com sucesso! " + emoji.happy);
+				} else {
+					Swal.error(response.value + " " + emoji.sad);
+				}
+			});
+
+			//<% } %>
+		}
+	});
+	//]]>
+</script>
