@@ -1,0 +1,87 @@
+﻿<input type="hidden" id="id" name="id" value="<%=(item ? item.id : 0) %>" />
+
+<div class="row">
+	<div class="col-sm-6">
+		<div class="form-group">
+			<label for="nome">Nome</label>
+			<input id="nome" name="nome" class="form-control" type="text" maxlength="100" value="<%=(item ? item.nome : "") %>" />
+		</div>
+	</div>
+
+	<div class="col-sm-6">
+		<div class="form-group">
+			<label for="url">URL</label>
+			<input id="url" name="url" class="form-control" type="text" maxlength="100" value="<%=(item ? item.url : "") %>" />
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-sm-12">
+		<div class="form-group">
+			<label for="idsecao">Seção</label>
+			<select id="idsecao" name="idsecao" class="form-control" size="1">
+				<option value="">Selecione...</option>
+				<% for (let i = 0; i < lista.length; i++) { %>
+				<option value="<%= lista[i].id %>" <%-((item && item.idsecao === lista[i].id) ? 'selected="selected"' : '') %>><%= lista[i].nome %></option>
+				<% } %>
+			</select> 
+		</div>
+	</div>
+</div>
+
+<%- contentFor("styles") %>
+<style class="text/css">
+	
+</style>
+
+<%- contentFor("scripts") %>
+<script type="text/javascript">
+	//<![CDATA[
+	"use strict";
+
+	$("#form").validate({
+		rules: {
+			idsecao: {
+				required: true
+			},
+			nome: {
+				required: true
+			},
+			url: {
+				required: true
+			}
+		},
+
+		submitHandler: function (form) {
+			if (JsonWebApi.active)
+				return;
+
+			Swal.wait();
+
+			//<% if (item) { %>
+
+			JsonWebApi.postFormData("<%- root %>/api/atividade/editar", form, function (response) {
+				if (response.success)
+					Swal.success("atividade alterada com sucesso! " + emoji.happy);
+				else
+					Swal.error(response.value + " " + emoji.sad);
+			});
+
+			//<% } else { %>
+
+			JsonWebApi.postFormData("<%- root %>/api/atividade/criar", form, function (response) {
+				if (response.success) {
+					resetForm("#form");
+					$("#tabelabody").empty();
+					Swal.success("atividade criada com sucesso! " + emoji.happy);
+				} else {
+					Swal.error(response.value + " " + emoji.sad);
+				}
+			});
+
+			//<% } %>
+		}
+	});
+	//]]>
+</script>

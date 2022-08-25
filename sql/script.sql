@@ -99,3 +99,10 @@ CREATE TABLE turma_atividade (
   CONSTRAINT turma_atividade_idturma_FK FOREIGN KEY (idturma) REFERENCES turma (id) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT turma_atividade_idatividade_FK FOREIGN KEY (idatividade) REFERENCES atividade (id) ON DELETE CASCADE ON UPDATE RESTRICT
 );
+
+insert into secao (id, nome) values (1, 'EXPLORANDO IDEIAS');
+insert into secao (nome) values ('APRENDENDO');
+insert into secao (nome) values ('ATIVIDADES');
+insert into secao (nome) values ('CONECTANDO');
+insert into secao (nome) values ('VAMOS JOGAR');
+
