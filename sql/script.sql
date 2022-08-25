@@ -75,16 +75,18 @@ CREATE TABLE turma_usuario (
 
 CREATE TABLE secao (
 	id int NOT NULL AUTO_INCREMENT,
-    nome varchar(30),
-    PRIMARY KEY (id));
+  nome varchar(30),
+  PRIMARY KEY (id)
+);
 
 CREATE TABLE atividade (
 	id int NOT NULL AUTO_INCREMENT,
-    url varchar(100) NOT NULL,
-    idsecao int NOT NULL,
-    PRIMARY KEY (id),
-    CONSTRAINT atividade_idsecao_FK FOREIGN KEY (idsecao) REFERENCES secao (id) ON DELETE RESTRICT ON UPDATE RESTRICT
-    );
+  nome varchar(100) NOT NULL,
+  url varchar(100) NOT NULL,
+  idsecao int NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT atividade_idsecao_FK FOREIGN KEY (idsecao) REFERENCES secao (id) ON DELETE RESTRICT ON UPDATE RESTRICT
+);
     
 
 CREATE TABLE turma_atividade (
