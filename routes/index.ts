@@ -7,11 +7,19 @@ class IndexRoute {
 		if (!u)
 			res.redirect(app.root + "/login");
 		else
+		if(u.idperfil !== 3){
 			res.render("index/index", {
 				layout: "layout-sem-form",
 				titulo: "Dashboard",
 				usuario: u
 			});
+		}else{
+			res.render("index/menu", {
+				layout: "menu",
+				titulo: "",
+				usuario: u
+			});
+		}
 	}
 
 	@app.http.all()
