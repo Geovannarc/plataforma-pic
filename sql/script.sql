@@ -70,3 +70,30 @@ CREATE TABLE turma_usuario (
   CONSTRAINT turma_usuario_idturma_FK FOREIGN KEY (idturma) REFERENCES turma (id) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT turma_usuario_idusuario_FK FOREIGN KEY (idusuario) REFERENCES usuario (id) ON DELETE CASCADE ON UPDATE RESTRICT
 );
+
+-- SCRIPT DE ATIVIDADES
+
+CREATE TABLE secao (
+	id int NOT NULL AUTO_INCREMENT,
+    nome varchar(30),
+    PRIMARY KEY (id));
+
+CREATE TABLE atividade (
+	id int NOT NULL AUTO_INCREMENT,
+    url varchar(100) NOT NULL,
+    idsecao int NOT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT atividade_idsecao_FK FOREIGN KEY (idsecao) REFERENCES secao (id) ON DELETE RESTRICT ON UPDATE RESTRICT
+    );
+    
+
+CREATE TABLE turma_atividade (
+  id int NOT NULL AUTO_INCREMENT,
+  idturma int NOT NULL,
+  idatividade int NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY turma_atividade_idturma_idatividade_UN (idturma, idatividade),
+  KEY turma_atividade_idatividade_IX (idatividade),
+  CONSTRAINT turma_atividade_idturma_FK FOREIGN KEY (idturma) REFERENCES turma (id) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT turma_atividade_idatividade_FK FOREIGN KEY (idatividade) REFERENCES atividade (id) ON DELETE CASCADE ON UPDATE RESTRICT
+);
