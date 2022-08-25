@@ -7,7 +7,7 @@
 	<hr class="sidebar-divider my-0">
 
 	<!-- Para deixar sempre em destaque, basta adicionar a classe active -->
-	<li class="nav-item">
+	<li class="nav-item active">
 		<a class="nav-link" href="<%- root %>/">
 			<i class="fas fa-fw fa-tachometer-alt"></i>
 			<span>Dashboard</span>
@@ -57,9 +57,42 @@
 
 	<hr class="sidebar-divider">
 
-	<div class="sidebar-heading">
-		Interface
-	</div>
+	<% if (usuario.idperfil == 2) { %>
+		<div class="sidebar-heading">
+			Gerenciar
+		</div>
+		<li class="nav-item">
+			<a class="nav-link" href="<%- root %>/turma?id=<%- usuario.id %>">
+				<i class="fas fa-fw fa-users"></i>
+				<span>Turmas</span>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" href="<%- root %>/mensagens">
+				<i class="fas fa-fw fa-comments"></i>
+				<span>Mensagens</span>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" href="<%- root %>/notas?id=<%- usuario.id %>">
+				<i class="fas fa-fw fa-clipboard-list"></i>
+				<span>Relatórios de notas</span>
+			</a>
+		</li>
+
+	<% } %>
+
+	<% if (usuario.idperfil == 3) { %>
+		
+		<li class="nav-item">
+			<a class="nav-link" href="<%- root %>/aula?id=<%- usuario.id %>">
+				<i class="fas fa-fw fa-users"></i>
+				<span>Minha turma</span>
+			</a>
+		</li>
+	<% } %>
+
+	<% if(usuario.admin){ %>
 
 	<li class="nav-item">
 		<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
@@ -133,6 +166,8 @@
 	</li>
 
 	<hr class="sidebar-divider d-none d-md-block">
+
+	<% } %>
 
 	<div class="text-center d-none d-md-inline">
 		<button class="rounded-circle border-0" id="sidebarToggle"></button>
