@@ -78,15 +78,4 @@ function changeContainerAtividades(id){
     }
     c = document.getElementById(id);
     c.style.display = "block";
-
-    if(id == '7'){
-        col2.style.backgroundColor = 'transparent';
-        col3.style.backgroundColor = '#0080001c'
-        Swal.fire({
-            title:"Parabéns! Você terminou a primeira parte.",
-            icon: 'success',
-            allowOutsideClick: false,
-            padding: '1em'
-        });
-    }
 }

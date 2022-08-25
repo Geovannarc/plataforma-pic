@@ -7,7 +7,7 @@ let col4 = document.getElementById('col4');
 col1.style.backgroundColor = '#0080001c'
 
 function changeContainer(id){
-    for(let i = 1; i<7; i++){
+    for(let i = 1; i<=8; i++){
         e = document.getElementById(i);
         e.style.display = "none";
     }
@@ -17,6 +17,8 @@ function changeContainer(id){
     if(id == '4'){
         col1.style.backgroundColor = 'transparent'
         col2.style.backgroundColor = '#0080001c'
+        col3.style.backgroundColor = 'transparent';
+        col3.style.backgroundColor = 'transparent';
         Swal.fire({
             title:"Parabéns! Você terminou a primeira parte.",
             icon: 'success',
@@ -25,6 +27,8 @@ function changeContainer(id){
         });
     }
     if(id == '7'){
+        col4.style.backgroundColor = 'transparent';
+        col1.style.backgroundColor = 'transparent';
         col2.style.backgroundColor = 'transparent';
         col3.style.backgroundColor = '#0080001c'
         Swal.fire({
@@ -35,8 +39,10 @@ function changeContainer(id){
         });
     }
     if(id == '8'){
+        col1.style.backgroundColor = 'transparent';
         col2.style.backgroundColor = 'transparent';
-        col3.style.backgroundColor = '#0080001c'
+        col3.style.backgroundColor = 'transparent';
+        col4.style.backgroundColor = '#0080001c'
         Swal.fire({
             title:"Parabéns! Você terminou a terceira parte.",
             icon: 'success',
