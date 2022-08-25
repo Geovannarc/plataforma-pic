@@ -1,0 +1,25 @@
+<%
+	let cores = [
+		"primary",
+		"secondary",
+		"success",
+		"info",
+		"warning",
+		"danger",
+		"dark"
+	];
+%>
+
+<% if (!lista.length) { %>
+<p class="text-center">Você ainda não tem atividades. 😢</p>
+<% } else { %>
+
+<div class="container" id="container">
+
+    
+
+</div>
+
+<% } %>
+<%- contentFor("scripts") %>
+<script src="<%= staticRoot %>/js/atividades/<%= id %>.js"></script>

@@ -81,12 +81,6 @@
 			</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" href="<%- root %>/mensagens">
-				<i class="fas fa-fw fa-comments"></i>
-				<span>Mensagens</span>
-			</a>
-		</li>
-		<li class="nav-item">
 			<a class="nav-link" href="<%- root %>/notas?id=<%- usuario.id %>">
 				<i class="fas fa-fw fa-clipboard-list"></i>
 				<span>Relatórios de notas</span>
@@ -94,16 +88,21 @@
 		</li>
 
 	<% } %>
-
 	<% if (usuario.idperfil == 3) { %>
-		
 		<li class="nav-item">
-			<a class="nav-link" href="<%- root %>/aula?id=<%- usuario.id %>">
-				<i class="fas fa-fw fa-users"></i>
-				<span>Minha turma</span>
+			<a class="nav-link" href="<%- root %>/notas?id=<%- usuario.id %>">
+				<i class="fas fa-fw fa-clipboard-list"></i>
+				<span>Minhas notas</span>
 			</a>
 		</li>
 	<% } %>
+
+	<li class="nav-item">
+		<a class="nav-link" href="<%- root %>/mensagens">
+			<i class="fas fa-fw fa-comments"></i>
+			<span>Mensagens</span>
+		</a>
+	</li>
 
 	<% if(usuario.admin){ %>
 
