@@ -1,0 +1,11 @@
+<div class="container-fluid" style="padding: 0;">
+	<div class="row">
+		<% for(let i=1; i<5; i++){ %> 
+			<div class="col-lg-3 text-center" id="col<%=i%>" style="cursor: pointer;" onclick="changeSectionMenu(id)">
+				<img src="<%staticRoot%>/public/img/icone<%=i%>.png" alt="" style="max-width: 100px;
+				max-height: 100px;"/>
+				<h3 class="mt-2"><%=secao[i].nome%></h3>
+			</div>
+		<%}%>
+	</div>
+</div>

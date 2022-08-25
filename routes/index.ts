@@ -1,4 +1,5 @@
 ﻿import app = require("teem");
+import { ids } from "../models/perfil";
 import Usuario = require("../models/usuario");
 
 class IndexRoute {
@@ -18,6 +19,35 @@ class IndexRoute {
 				layout: "menu",
 				titulo: "",
 				usuario: u
+			});
+		}
+	}
+
+	public static async mensagens(req: app.Request, res: app.Response) {
+		let u = await Usuario.cookie(req);
+		if (!u)
+			res.redirect(app.root + "/acesso");
+		else
+			res.render("index/mensagem", {
+				layout: "layout-sem-form",
+				titulo: "Mensagens",
+				usuario: u
+			});
+	}
+
+	public static async notas(req: app.Request, res: app.Response) {
+		let u = await Usuario.cookie(req);
+		if (!u)
+			res.redirect(app.root + "/acesso");
+		else{
+			let id = parseInt(req.query["id"] as string);
+			let item: Usuario = null;
+			res.render("index/notas", {
+				layout: "layout-tabela",
+				titulo: "Mensagens",
+				usuario: u,
+				item,
+				id: id
 			});
 		}
 	}

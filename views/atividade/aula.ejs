@@ -1,3 +1,4 @@
+<%- include("botoes") %>
 <%
 	let cores = [
 		"primary",
@@ -14,12 +15,237 @@
 <p class="text-center">Você ainda não tem atividades. 😢</p>
 <% } else { %>
 
-<div class="container" id="container">
+<div class="container-fluid" style="background-image: url('<%= staticRoot %>/img/fundo6.jpg'); padding: 2rem;">
+    <div class="width-90" id="1">
+        <h1 class="text-center">
+            Empate por insuficiência de peças
+        </h1>
+        <h3>
+            Já aprendemos que para vencer uma partida precisamos aplicar o xeque-mate. Mas nem sempre isso é possível! Se acontecer dos jogadores ficarem sem peças capazes de aplicar o xeque-mate, o jogo termina em empate por insuficiência de peças.
+            Um único bispo ou um único cavalo, mesmo com a ajuda do seu rei, não são capazes de forçar o xeque-mate.
+        </h3>
+        <div class="row mt-4">
+            <div class="col-sm-4">
+                <img src="<%= staticRoot %>/img/empate1.jpg" alt="" class="max-w-100"/>
+            </div>
+            <div class="col-sm-4">
+                <img src="<%= staticRoot %>/img/empate2.jpg" alt="" class="max-w-100"/>
+            </div>
+            <div class="col-sm-4">
+                <img src="<%= staticRoot %>/img/empate3.jpg" alt="" class="max-w-100"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
 
+            </div>
+            <div class="col-sm-6" style="text-align: right;">
+                <button onclick="changeContainer('2');" class="btn btn-success mt-5"><i class="fa fa-arrow-right fa-2x" id="botao1"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="width-90" id="2" style="display: none;">
+        <h1 class="text-center mt-5">
+            Empate por comum acordo
+        </h1>
+        <h3>
+            Os dois jogadores podem concordar em empatar uma partida. Ás vezes os jogadores não querem arriscar e o com o empate cada um recebe meio ponto no torneio!
+        </h3>
+        <hr>
+        <h1 class="text-center mt-5">
+            Empate por repetição
+        </h1>
+        <h3>
+            Se os jogadores repetirem os lances e a partida ficar sem progresso, o árbitro pode decretar empate da partida. As regras variam conforme o ritmo de jogo mas, em geral, se houver três repetições o jogo é empatado por repetição.
+        </h3>
+        <hr>
+        <h1 class="text-center mt-5">
+            Empate por 50 lances de rei solitário
+        </h1>
+        <h3>
+            Se em uma partida um dos jogadores tiver somente o Rei e o outro jogador possuir peças suficientes para aplicar o xeque-mate, esse terá que vencer em até 50 lances, caso contrário a partida é finalizada em empate!
+        </h3>
+        <hr>
+        <div class="row">
+            <div class="col-sm-6">
+                
+            </div>
+            <div class="col-sm-6" style="text-align: right;">
+                <button class="btn btn-success mt-5" onclick="changeContainer('3')"><i class="fa fa-arrow-right fa-2x"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="width-90" id="3" style="display: none;">
+        <h1 class="text-center">
+            Empate por afogamento
+        </h1>
+        <h3>
+            O xeque-mate acontece quando o Rei é ameaçado e não é possível sair da ameaça. Se acontecer de um dos jogadores ter a vez de jogar e não existir nenhum lance possível para fazer, a partida termina em empate por afogamento!
+            Nas imagens abaixo, se for a vez das brancas jogarem, não há movimento possível! Empate por afogamento!
+        </h3>
+        <div class="row mt-4">
+            <div class="col-sm-4">
+                <img src="<%= staticRoot %>/img/empate4.jpg" alt="" class="max-w-100"/>
+            </div>
+            <div class="col-sm-4">
+                <img src="<%= staticRoot %>/img/empate5.jpg" alt="" class="max-w-100"/>
+            </div>
+            <div class="col-sm-4">
+                <img src="<%= staticRoot %>/img/empate6.jpg" alt="" class="max-w-100"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+
+            </div>
+            <div class="col-sm-6" style="text-align: right;">
+                <button onclick="changeContainer('4');" class="btn btn-success mt-5"><i class="fa fa-arrow-right fa-2x" id="botao1"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="width-90" id="4" style="display: none;">
+        <h1 class="text-center">
+            Em cada diagrama a seguir é a vez das brancas jogarem. Marque a opção correta.
+        </h1>
+        <div class="row mt-4">
+            <div class="col-sm-6 text-center">
+                <img src="<%= staticRoot %>/img/empate7.jpg" alt="" class="max-w-100"/>
+            </div>
+            <div class="col-sm-6">
+                <ul>
+                    <li class="option" id="answer1" onclick="checkAnswer('1')">
+                        Empate por afogamento.
+                    </li>
+                    <li class="option" id="answer2" onclick="checkAnswer('2')">
+                        Empate por insuficiência de peças.
+                    </li>
+                    <li class="option" id="answer3" onclick="checkAnswer('3')">
+                        Xeque-mate.
+                    </li>
+                    <li class="option" id="answer4" onclick="checkAnswer('4')">
+                        Não é empate.
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+
+            </div>
+            <div class="col-sm-6" style="text-align: right;">
+                <button onclick="changeContainerAtividades('5');" class="btn btn-success mt-5"><i class="fa fa-arrow-right fa-2x" id="botao1"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="width-90" id="5" style="display: none;">
+        <h1 class="text-center">
+            Em cada diagrama a seguir é a vez das brancas jogarem. Marque a opção correta.
+        </h1>
+        <div class="row mt-4">
+            <div class="col-sm-6 text-center">
+                <img src="<%= staticRoot %>/img/empate9.jpg" alt="" class="max-w-100"/>
+            </div>
+            <div class="col-sm-6">
+                <ul>
+                    <li class="option" id="answer9" onclick="checkAnswer('9')">
+                        Empate por afogamento.
+                    </li>
+                    <li class="option" id="answer10" onclick="checkAnswer('10')">
+                        Empate por insuficiência de peças.
+                    </li>
+                    <li class="option" id="answer11" onclick="checkAnswer('11')">
+                        Xeque-mate.
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+                <div class="col-sm-6">
     
-
+                </div>
+                <div class="col-sm-6" style="text-align: right;">
+                    <button onclick="changeContainerAtividades('6');" class="btn btn-success mt-5"><i class="fa fa-arrow-right fa-2x" id="botao1"></i></button>
+                </div>
+        </div>
+    </div>
+    <div class="width-90" id="6" style="display: none;">
+        <h1 class="text-center">
+            Em cada diagrama a seguir é a vez das brancas jogarem. Marque a opção correta.
+        </h1>
+        <div class="row mt-4">
+            <div class="col-sm-6 text-center">
+                <img src="<%= staticRoot %>/img/empate10.jpg" alt="" class="max-w-100"/>
+            </div>
+            <div class="col-sm-6">
+                <ul>
+                    <li class="option" id="answer12" onclick="checkAnswer('12')">
+                        Empate por afogamento.
+                    </li>
+                    <li class="option" id="answer13" onclick="checkAnswer('13')">
+                        Empate por insuficiência de peças.
+                    </li>
+                    <li class="option" id="answer14" onclick="checkAnswer('14')">
+                        Xeque-mate.
+                    </li>
+                    <li class="option" id="answer15" onclick="checkAnswer('15')">
+                        Não é empate.
+                    </li>
+                </ul>
+            </div>
+        </div>
+            <div class="row">
+                <div class="col-sm-6">
+    
+                </div>
+                <div class="col-sm-6" style="text-align: right;">
+                    <button onclick="changeContainerAtividades('7');" class="btn btn-success mt-5"><i class="fa fa-arrow-right fa-2x" id="botao1"></i></button>
+                </div>
+            </div>
+    </div>
+    <div class="width-90" id="7" style="display: none;">
+        <div class="row mt-4">
+            <div class="col-sm-6 text-center">
+                <img src="<%= staticRoot %>/img/phone.png" alt="" class="max-w-100"/>
+            </div>
+            <div class="col-sm-6 mt-4">
+                <h2 class="text-center">
+                    Existem vários aplicativos para jogar xadrez pelo celular. Você poderá jogar com pessoas do mundo todo, assim como conhecer várias variantes do jogo, como o 3 xeques, Rei da Colina, Australiana, Xadrez Solo e outros!
+                </h2>
+            </div>
+        </div>
+            <div class="row">
+                <div class="col-sm-6">
+    
+                </div>
+                <div class="col-sm-6" style="text-align: right;">
+                    <button onclick="changeContainerAtividades('8');" class="btn btn-success mt-5"><i class="fa fa-arrow-right fa-2x" id="botao1"></i></button>
+                </div>
+            </div>
+    </div>
+    <div class="width-90" id="8" style="display: none;">
+        <div class="row">
+            <div class="col-lg-8">
+                <iframe src="https://portalsistemax.com.br/batalha1.html" width="100%" height="100%"
+                style="min-height: 60rem;
+                overflow: hidden;
+                border: none;"></iframe>
+            </div>
+            <div class="col-lg-4">
+                <h3>
+                    Neste jogo você vai jogar com todas as regras
+                    normais do xadrez, mas atenção: vence o jogo quem conseguir aplicar o xeque três vezes no adversário! Fique atento pois agora a estratégia do jogo é outra...
+                </h3>
+            </div>
+        </div>
+    </div>
+    
 </div>
 
 <% } %>
 <%- contentFor("scripts") %>
-<script src="<%= staticRoot %>/js/atividades/<%= id %>.js"></script>
+<script src="<%= staticRoot %>/js/atividades/aprendendo/<%= id %>.js"></script>
+<script src="<%= staticRoot %>/js/atividades/atividades/<%= id %>.js"></script>
+<script src="<%= staticRoot %>/js/atividades/vamosjogar/<%= id %>.js"></script>
+<script src="<%= staticRoot %>/js/atividades/conectando/<%= id %>.js"></script>

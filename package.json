@@ -12,6 +12,8 @@
   },
   "main": "src/app.js",
   "dependencies": {
+    "@chrisoakman/chessboardjs": "^1.0.0",
+    "chess.js": "^0.13.4",
     "dotenv": "16.0.1",
     "teem": "0.0.23"
   },
