@@ -86,7 +86,7 @@ class Turma {
 	public static listarDeUsuario(idusuario: number): Promise<Turma[]> {
 		return app.sql.connect(async (sql) => {
 			// @@@
-			return (await sql.query("select d.id, d.idsecao, d.ano, d.semestre, d.nome, du.professor, du.turma, date_format(d.criacao, '%d/%m/%Y') criacao from turma_usuario du inner join turma d on d.id = du.idturma where du.idusuario = ? and d.exclusao is null order by d.ano desc, d.semestre desc, d.nome asc", [idusuario])) || [];
+			return (await sql.query("select d.id, d.ano, d.serie, d.nome, d.sala, du.professor, date_format(d.criacao, '%d/%m/%Y') criacao from turma_usuario du inner join turma d on d.id = du.idturma where du.idusuario = ? and d.exclusao is null order by d.ano desc, d.nome asc", [idusuario])) || [];
 		});
 	}
 

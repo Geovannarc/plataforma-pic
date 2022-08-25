@@ -23,8 +23,8 @@
 		<div class="card-body">
 			<div class="row no-gutters align-items-center">
 				<div class="col mr-2">
-					<div class="text-xs font-weight-bold text-<%- cor %> text-uppercase mb-1"><%- turma.ano %>-<%- turma.semestre %> / <%= turma.turma %></div>
-					<div class="h5 mb-0 font-weight-bold text-gray-800"><%= turma.idsecao %> - <%= turma.nome %></div>
+					<div class="text-xs font-weight-bold text-<%- cor %> text-uppercase mb-1"><%- turma.ano %> / <%= turma.nome %></div>
+					<div class="h5 mb-0 font-weight-bold text-gray-800"><%= turma.serie %> - <%= turma.sala %></div>
 				</div>
 				<div class="col-auto">
 					<i class="fas fa-book fa-2x text-gray-300"></i>
@@ -33,15 +33,7 @@
 
 			<hr />
 
-			<% if (turma.ancora) { %>
-			<div class="mb-3 font-weight-bold text-<%- cor %>">Gerente</div>
-
-			<div class="mb-3">
-				<a href="<%- root %>/turma/verificacao?id=<%- turma.id %>" class="btn btn-sm btn-<%- cor %>"><i class="fa fa-fw fa-user-check"></i> Verificação de Presença</a>
-			</div>
-			<% } %>
-
-			<a href="<%- root %>/turma/presenca?id=<%- turma.id %>" class="btn btn-sm btn-outline-<%- cor %>"><i class="fa fa-fw fa-calendar-check"></i> Consultar Presenças</a>
+			<a href="<%- root %>/turma/turma?id=<%- turma.id %>" class="btn btn-sm btn-outline-<%- cor %>"><i class="fa fa-fw fa-calendar-check"></i> Gerenciar turma</a>
 		</div>
 	</div>
 </div>
