@@ -17,13 +17,9 @@ class Atividade {
 	}
 
 	public static async listar(): Promise<Atividade[]> {
-		let lista: Atividade[] = null;
-
-		await app.sql.connect(async (sql) => {
-			lista = await sql.query("select id, nome, url, idsecao from atividade") ;
+		return app.sql.connect(async (sql) => {
+			return (await sql.query("select id, nome, url, idsecao from atividade")) || [];
 		});
-
-		return (lista || []);
 	}
 
 	public static async listarCombo(): Promise<Atividade[]> {
@@ -93,7 +89,7 @@ class Atividade {
 
 	public static async excluir(id: number): Promise<string> {
 		return app.sql.connect(async (sql) => {
-			await sql.query("delete atividade where id = ?",  [id]);
+			await sql.query("delete from atividade where id = ?",  [id]);
 
 			return (sql.affectedRows ? null : "atividade não encontrada");
 		});

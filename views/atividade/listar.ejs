@@ -6,15 +6,14 @@
 	"use strict";
 
 	var tabela = prepareDataTable("tabela", {
-		order: [[1, "desc"], [2, "asc"], [3, "asc"]],
+		order: [[1, "desc"], [2, "asc"]],
 		deferRender: true,
 		columns: [
 			{ title: "", "class": "col-min", searchable: false, orderable: false, data: "id", render: function (v, type, row) {
 				return '<a target="_blank" title="Editar" href="<%- root %>/atividade/editar?id=' + row.id + '" class="btn btn-sm btn-outline-primary"><i class="fa fa-fw fa-edit"></i></a> <button title="Excluir" type="button" data-excluir="1" class="btn btn-sm btn-outline-danger"><i class="fa fa-fw fa-times"></i></button>';
 			}},
 			{ title: "Nome", render: encode, data: "nome" },
-			{ title: "URL", render: encode, data: "url" },
-			{ title: "Seção", render: encode, data: "idsecao" }
+			{ title: "URL", render: encode, data: "url" }
 		],
 		data: <%- JSON.stringify(lista) %>,
 		export: { title: "atividades" }
