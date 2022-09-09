@@ -55,6 +55,27 @@ class AtividadeApiRoute {
 
 		res.sendStatus(204);
 	}
+
+	@app.http.post()
+	public static async registrarTentativa(req: app.Request, res: app.Response) {
+		const u = await Usuario.cookie(req, res, true);
+		if (!u)
+		 	return;
+
+		if (!req.body) {
+			res.status(400).json("Dados inválidos");
+			return;
+		}
+
+		const erro = await Atividade.registrarTentativa(parseInt(req.body.idturma_atividade), u.id, parseInt(req.body.nota));
+
+		if (erro) {
+			res.status(400).json(erro);
+			return;
+		}
+
+		res.sendStatus(204);
+	}
 }
 
 export = AtividadeApiRoute;

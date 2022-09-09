@@ -9,6 +9,17 @@ interface Atividade {
 
 class Atividade {
 
+	public static registrarTentativa(idturma_atividade: number, id: number, nota: number) {
+		return app.sql.connect(async (sql) => {
+
+			await sql.query("update turma_atividade_usuario set conclusao = ?, nota = ? where id = ?", [idturma_atividade, nota, id]);
+
+				if (!sql.affectedRows)
+					return sql.query("insert into turma_atividade_usuario (idturma_atividade, nota, conclusao, idusuario) values (?, ?, ?, ?)", [idturma_atividade, id]);
+				return null;
+		})
+	}
+
 	public static listarDeatividade(id: number): Promise<Atividade[]> {
 		return app.sql.connect(async (sql) => {
 			// @@@
@@ -65,12 +76,11 @@ class Atividade {
 
 		return app.sql.connect(async (sql) => {
 			try {
-				await sql.beginTransaction();
-
 				await sql.query("update atividade set nome = ?, url = ?, idsecao = ? where id = ?", [atividade.nome, atividade.url, atividade.idsecao, atividade.id]);
 
 				if (!sql.affectedRows)
 					return "atividade não encontrada";
+				return null;
 			} catch (e) {
 				if (e.code) {
 					switch (e.code) {

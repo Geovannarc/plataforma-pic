@@ -29,7 +29,7 @@ class EscolaRoute {
 		} else {
 			let id = parseInt(req.query["id"] as string);
 			let item: Escola = null;
-			if (isNaN(id))
+			if (isNaN(id) || !(item = await Escola.obter(id)))
 				res.render("index/nao-encontrado", {
 					layout: "layout-sem-form",
 					usuario: u
@@ -38,8 +38,7 @@ class EscolaRoute {
 				res.render("escola/editar", {
 					titulo: "Editar Escola",
 					usuario: u,
-					item,
-                    escolas: await Escola.listarCombo()
+					item
 				});
 		}
 	}

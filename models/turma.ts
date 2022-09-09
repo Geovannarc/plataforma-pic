@@ -128,7 +128,7 @@ class Turma {
 			}
 
 			try {
-				turma.id = await sql.scalar("select last_insert_id()") as number;
+				turma.id = await sql.scalar("select last_insert_id()");
 
 				if (turma.idsusuario && turma.professores) {
 					for (let i = turma.idsusuario.length - 1; i >= 0; i--)

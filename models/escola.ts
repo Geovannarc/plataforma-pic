@@ -100,12 +100,12 @@ class Escola {
 
 		return app.sql.connect(async (sql) => {
 			try {
-				await sql.beginTransaction();
-
 				await sql.query("update escola set nome = ?, contato = ?, email = ? where id = ? and exclusao is null", [escola.nome, escola.contato, escola.email, escola.id]);
 
 				if (!sql.affectedRows)
 					return "Escola não encontrada";
+
+				return null;
 			} catch (e) {
 				if (e.code) {
 					switch (e.code) {

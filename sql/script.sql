@@ -87,7 +87,6 @@ CREATE TABLE atividade (
   PRIMARY KEY (id),
   CONSTRAINT atividade_idsecao_FK FOREIGN KEY (idsecao) REFERENCES secao (id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
-    
 
 CREATE TABLE turma_atividade (
   id int NOT NULL AUTO_INCREMENT,
@@ -99,6 +98,32 @@ CREATE TABLE turma_atividade (
   CONSTRAINT turma_atividade_idturma_FK FOREIGN KEY (idturma) REFERENCES turma (id) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT turma_atividade_idatividade_FK FOREIGN KEY (idatividade) REFERENCES atividade (id) ON DELETE CASCADE ON UPDATE RESTRICT
 );
+
+CREATE TABLE turma_atividade_usuario (
+  id int NOT NULL AUTO_INCREMENT,
+  idturma_atividade int NOT NULL,
+  idusuario int NOT NULL,
+  nota int NOT NULL,
+  conclusao datetime NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY turma_atividade_usuario_idturma_atividade_idusuario_UN (idturma_atividade, idusuario),
+  KEY turma_atividade_usuario_idturma_atividade_idusuario_IX (idturma_atividade, idusuario),
+  KEY turma_atividade_usuario_idusuario_IX (idusuario),
+  CONSTRAINT turma_atividade_usuario_idturma_atividade_FK FOREIGN KEY (idturma_atividade) REFERENCES turma_atividade (id) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT turma_atividade_usuario_idusuario_FK FOREIGN KEY (idusuario) REFERENCES usuario (id) ON DELETE CASCADE ON UPDATE RESTRICT
+);
+
+CREATE TABLE turma_atividade_usuario_tentativa (
+  id int NOT NULL AUTO_INCREMENT,
+  idturma_atividade_usuario int NOT NULL,
+  nota int NOT NULL,
+  data datetime NOT NULL,
+  PRIMARY KEY (id),
+  KEY turma_atividade_usuario_tentativa_idturma_atividade_usuario_IX (idturma_atividade_usuario),
+  CONSTRAINT turma_atividade_usuario_tentativa_idturma_atividade_usuario_FK FOREIGN KEY (idturma_atividade_usuario) REFERENCES turma_atividade_usuario (id) ON DELETE CASCADE ON UPDATE RESTRICT
+);
+
+-- select conclusao from turma_atividade_usuario where idturma_atividade = xxx and idusuario = yyy
 
 insert into secao (id, nome) values (1, 'EXPLORANDO IDEIAS');
 insert into secao (nome) values ('APRENDENDO');
