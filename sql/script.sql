@@ -42,6 +42,38 @@ CREATE TABLE escola (
   KEY escola_exclusao_IX (exclusao)
 );
 
+-- SCRIPT DE ATIVIDADES
+
+CREATE TABLE secao (
+  id int NOT NULL,
+  nome varchar(30) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+-- Manter sincronizado com enums/secao.ts e models/secao.ts
+INSERT INTO secao (id, nome) VALUES (1, 'EXPLORANDO IDEIAS'), (2, 'APRENDENDO'), (3, 'ATIVIDADES'), (4, 'CONECTANDO'), (5, 'VAMOS JOGAR');
+
+CREATE TABLE livro (
+  id int NOT NULL AUTO_INCREMENT,
+  nome varchar(100) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE atividade (
+  id int NOT NULL AUTO_INCREMENT,
+  nome varchar(100) NOT NULL,
+  url varchar(100) NOT NULL,
+  idlivro int NOT NULL,
+  capitulo int NOT NULL,
+  idsecao int NOT NULL,
+  ordem int NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY atividade_idlivro_idsecao_UN (idlivro, idsecao),
+  KEY atividade_idsecao_IX (idsecao),
+  CONSTRAINT atividade_idlivro_FK FOREIGN KEY (idlivro) REFERENCES livro (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT atividade_idsecao_FK FOREIGN KEY (idsecao) REFERENCES secao (id) ON DELETE RESTRICT ON UPDATE RESTRICT
+);
+
 CREATE TABLE turma (
   id int NOT NULL AUTO_INCREMENT,
   idescola int NOT NULL,
@@ -49,6 +81,7 @@ CREATE TABLE turma (
   serie smallint NOT NULL,
   nome varchar(100) NOT NULL,
   sala varchar(100) NOT NULL,
+  idlivro int NOT NULL,
   exclusao datetime NULL,
   criacao datetime NOT NULL,
   PRIMARY KEY (id),
@@ -56,7 +89,8 @@ CREATE TABLE turma (
   KEY turma_ano_exclusao_IX (ano, exclusao),
   KEY turma_idescola_exclusao_IX (idescola, exclusao),
   KEY turma_exclusao_IX (exclusao),
-  CONSTRAINT turma_idescola_FK FOREIGN KEY (idescola) REFERENCES escola (id) ON DELETE RESTRICT ON UPDATE RESTRICT
+  CONSTRAINT turma_idescola_FK FOREIGN KEY (idescola) REFERENCES escola (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT turma_idlivro_FK FOREIGN KEY (idlivro) REFERENCES livro (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
 );
 
 CREATE TABLE turma_usuario (
@@ -71,24 +105,7 @@ CREATE TABLE turma_usuario (
   CONSTRAINT turma_usuario_idusuario_FK FOREIGN KEY (idusuario) REFERENCES usuario (id) ON DELETE CASCADE ON UPDATE RESTRICT
 );
 
--- SCRIPT DE ATIVIDADES
-
-CREATE TABLE secao (
-	id int NOT NULL AUTO_INCREMENT,
-  nome varchar(30),
-  PRIMARY KEY (id)
-);
-
-CREATE TABLE atividade (
-	id int NOT NULL AUTO_INCREMENT,
-  nome varchar(100) NOT NULL,
-  url varchar(100) NOT NULL,
-  idsecao int NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT atividade_idsecao_FK FOREIGN KEY (idsecao) REFERENCES secao (id) ON DELETE RESTRICT ON UPDATE RESTRICT
-);
-
-CREATE TABLE turma_atividade (
+CREATE TABLE turma_atividade_liberada (
   id int NOT NULL AUTO_INCREMENT,
   idturma int NOT NULL,
   idatividade int NOT NULL,
@@ -124,10 +141,3 @@ CREATE TABLE turma_atividade_usuario_tentativa (
 );
 
 -- select conclusao from turma_atividade_usuario where idturma_atividade = xxx and idusuario = yyy
-
-insert into secao (id, nome) values (1, 'EXPLORANDO IDEIAS');
-insert into secao (nome) values ('APRENDENDO');
-insert into secao (nome) values ('ATIVIDADES');
-insert into secao (nome) values ('CONECTANDO');
-insert into secao (nome) values ('VAMOS JOGAR');
-

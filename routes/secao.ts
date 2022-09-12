@@ -1,7 +1,7 @@
 import app = require("teem");
 import appsettings = require("../appsettings");
 import Escola = require("../models/escola");
-import Secao = require("../models/secao");
+import secoes = require("../models/secao");
 import Usuario = require("../models/usuario");
 
 class SecaoRoute {
@@ -16,7 +16,7 @@ class SecaoRoute {
 				titulo: "Gerenciar secaos",
 				datatables: true,
 				usuario: u,
-				lista: await Secao.listar()
+				lista: secoes.lista
 			});
 	}
 }

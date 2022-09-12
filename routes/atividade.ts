@@ -3,7 +3,7 @@ import appsettings = require("../appsettings");
 import Escola = require("../models/escola");
 import Atividade = require("../models/atividade");
 import Usuario = require("../models/usuario");
-import Secao = require("../models/secao");
+import secoes = require("../models/secao");
 
 class AtividadeRoute {
 	public static async criar(req: app.Request, res: app.Response) {
@@ -16,7 +16,7 @@ class AtividadeRoute {
 				textoSubmit: "Criar",
 				usuario: u,
 				item: null,
-                lista: await Secao.listar()
+                lista: secoes.lista
 			});
 		}
 	}
@@ -38,7 +38,7 @@ class AtividadeRoute {
 					titulo: "Editar atividade",
 					usuario: u,
 					item,
-                    lista: await Secao.listar()
+                    lista: secoes.lista
 				});
 		}
 	}
@@ -70,7 +70,7 @@ class AtividadeRoute {
 				usuario: u,
                 id: id,
 				lista: await Atividade.listarDeatividade(id),
-                secao: await Secao.listar()
+                secao: secoes.lista
 			});
         }
 	}
