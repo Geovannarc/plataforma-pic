@@ -15,7 +15,7 @@ class Atividade {
 			await sql.query("update turma_atividade_usuario set conclusao = ?, nota = ? where id = ?", [idturma_atividade, nota, id]);
 
 				if (!sql.affectedRows)
-					return sql.query("insert into turma_atividade_usuario (idturma_atividade, nota, conclusao, idusuario) values (?, ?, ?, ?)", [idturma_atividade, id]);
+					return "atividade não encontrada";
 				return null;
 		})
 	}
