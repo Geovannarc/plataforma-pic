@@ -58,7 +58,7 @@ class AtividadeApiRoute {
 
 	@app.http.post()
 	public static async registrarTentativa(req: app.Request, res: app.Response) {
-		const u = await Usuario.cookie(req, res, true);
+		const u = await Usuario.cookie(req, res);
 		if (!u)
 		 	return;
 
@@ -67,7 +67,7 @@ class AtividadeApiRoute {
 			return;
 		}
 
-		const erro = await Atividade.registrarTentativa(parseInt(req.body.idturma_atividade), u.id, parseInt(req.body.nota));
+		const erro = await Atividade.registrarTentativa(parseInt(req.body.idturma), u.id, parseInt(req.body.idatividade), parseInt(req.body.nota));
 
 		if (erro) {
 			res.status(400).json(erro);

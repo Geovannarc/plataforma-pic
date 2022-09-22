@@ -17,23 +17,37 @@
 </div>
 
 <div class="row">
-	<div class="col-sm-12">
+	<div class="col-sm-4">
+		<div class="form-group">
+			<label for="idlivro">Livro</label>
+			<select id="idlivro" name="idlivro" class="form-control" size="1">
+				<option value="">Selecione...</option>
+				<% for (let i = 0; i < livros.length; i++) { %>
+				<option value="<%= livros[i].id %>" <%-((item && item.idlivro === livros[i].id) ? 'selected="selected"' : '') %>><%= livros[i].nome %></option>
+				<% } %>
+			</select> 
+		</div>
+	</div>
+
+	<div class="col-sm-4">
+		<div class="form-group">
+			<label for="capitulo">Capítulo</label>
+			<input id="capitulo" name="capitulo" class="form-control" type="number" min="1" max="999" value="<%=(item ? item.capitulo : "") %>" />
+		</div>
+	</div>
+
+	<div class="col-sm-4">
 		<div class="form-group">
 			<label for="idsecao">Seção</label>
 			<select id="idsecao" name="idsecao" class="form-control" size="1">
 				<option value="">Selecione...</option>
-				<% for (let i = 0; i < lista.length; i++) { %>
-				<option value="<%= lista[i].id %>" <%-((item && item.idsecao === lista[i].id) ? 'selected="selected"' : '') %>><%= lista[i].nome %></option>
+				<% for (let i = 0; i < secoes.length; i++) { %>
+				<option value="<%= secoes[i].id %>" <%-((item && item.idsecao === secoes[i].id) ? 'selected="selected"' : '') %>><%= secoes[i].nome %></option>
 				<% } %>
 			</select> 
 		</div>
 	</div>
 </div>
-
-<%- contentFor("styles") %>
-<style class="text/css">
-	
-</style>
 
 <%- contentFor("scripts") %>
 <script type="text/javascript">
@@ -42,15 +56,21 @@
 
 	$("#form").validate({
 		rules: {
-			idsecao: {
-				required: true
-			},
 			nome: {
 				required: true
 			},
 			url: {
 				required: true
-			}
+			},
+			idlivro: {
+				required: true
+			},
+			capitulo: {
+				required: true
+			},
+			idsecao: {
+				required: true
+			},
 		},
 
 		submitHandler: function (form) {
@@ -63,7 +83,7 @@
 
 			JsonWebApi.postFormData("<%- root %>/api/atividade/editar", form, function (response) {
 				if (response.success)
-					Swal.success("atividade alterada com sucesso! " + emoji.happy);
+					Swal.success("Atividade alterada com sucesso! " + emoji.happy);
 				else
 					Swal.error(response.value + " " + emoji.sad);
 			});
@@ -73,8 +93,7 @@
 			JsonWebApi.postFormData("<%- root %>/api/atividade/criar", form, function (response) {
 				if (response.success) {
 					resetForm("#form");
-					$("#tabelabody").empty();
-					Swal.success("atividade criada com sucesso! " + emoji.happy);
+					Swal.success("Atividade criada com sucesso! " + emoji.happy);
 				} else {
 					Swal.error(response.value + " " + emoji.sad);
 				}

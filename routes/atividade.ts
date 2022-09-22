@@ -4,6 +4,7 @@ import Escola = require("../models/escola");
 import Atividade = require("../models/atividade");
 import Usuario = require("../models/usuario");
 import secoes = require("../models/secao");
+import livros = require("../models/livro");
 
 class AtividadeRoute {
 	public static async criar(req: app.Request, res: app.Response) {
@@ -12,11 +13,12 @@ class AtividadeRoute {
 			res.redirect(app.root + "/acesso");
 		} else {
 			res.render("atividade/editar", {
-				titulo: "Criar atividade",
+				titulo: "Criar Atividade",
 				textoSubmit: "Criar",
 				usuario: u,
 				item: null,
-                lista: secoes.lista
+				livros: livros.lista,
+                secoes: secoes.lista
 			});
 		}
 	}
@@ -35,10 +37,11 @@ class AtividadeRoute {
 				});
 			else
 				res.render("atividade/editar", {
-					titulo: "Editar atividade",
+					titulo: "Editar Atividade",
 					usuario: u,
 					item,
-                    lista: secoes.lista
+					livros: livros.lista,
+					secoes: secoes.lista
 				});
 		}
 	}
@@ -50,7 +53,7 @@ class AtividadeRoute {
 		else
 			res.render("atividade/listar", {
 				layout: "layout-tabela",
-				titulo: "Gerenciar atividades",
+				titulo: "Gerenciar Atividades",
 				datatables: true,
 				usuario: u,
 				lista: await Atividade.listar()
@@ -73,20 +76,6 @@ class AtividadeRoute {
                 secao: secoes.lista
 			});
         }
-	}
-
-	public static async index(req: app.Request, res: app.Response) {
-		let u = await Usuario.cookie(req);
-		if (!u)
-			res.redirect(app.root + "/acesso");
-		else
-			res.render("atividade/index", {
-				layout: "layout-sem-form",
-				titulo: "Minhas atividades",
-				datatables: true,
-				usuario: u,
-				lista: await Atividade.listarCombo()
-			});
 	}
 }
 

@@ -54,9 +54,8 @@ CREATE TABLE atividade (
   idlivro int NOT NULL,
   capitulo int NOT NULL,
   idsecao int NOT NULL,
-  ordem int NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE KEY atividade_idlivro_idsecao_UN (idlivro, idsecao),
+  UNIQUE KEY atividade_idlivro_capitulo_idsecao_UN (idlivro, capitulo, idsecao),
   KEY atividade_idsecao_IX (idsecao),
   CONSTRAINT atividade_idlivro_FK FOREIGN KEY (idlivro) REFERENCES livro (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT atividade_idsecao_FK FOREIGN KEY (idsecao) REFERENCES secao (id) ON DELETE RESTRICT ON UPDATE RESTRICT
