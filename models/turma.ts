@@ -19,7 +19,7 @@ interface Turma {
 	sala: string;
 	exclusao?: string | null;
 	criacao: string;
-
+	idlivro: number;
 	usuarios?: any[];
 	idsusuario?: number[];
 	professores?: number[];
@@ -79,7 +79,7 @@ class Turma {
 
 	public static listar(): Promise<Turma[]> {
 		return app.sql.connect(async (sql) => {
-			return (await sql.query("select t.id, t.ano, t.serie, t.nome, t.sala, e.nome escola from turma t inner join escola e on e.id = t.idescola where t.exclusao is null")) || [];
+			return (await sql.query("select t.id, t.ano, t.serie, t.nome, t.idlivro, t.sala, e.nome escola from turma t inner join escola e on e.id = t.idescola where t.exclusao is null")) || [];
 		});
 	}
 
@@ -92,7 +92,7 @@ class Turma {
 
 	public static obter(id: number): Promise<Turma> {
 		return app.sql.connect(async (sql) => {
-			const lista: Turma[] = await sql.query("select id, idescola, ano, serie, nome, sala from turma where id = ? and exclusao is null", [id]);
+			const lista: Turma[] = await sql.query("select id, idescola, idlivro, ano, serie, nome, sala from turma where id = ? and exclusao is null", [id]);
 
 			const turma = (lista && lista[0]) || null;
 
@@ -112,7 +112,7 @@ class Turma {
 			try {
 				await sql.beginTransaction();
 
-				await sql.query("insert into turma (idescola, ano, serie, nome, sala, criacao) values (?, ?, ?, ?, ?, ?)", [turma.idescola, turma.ano, turma.serie, turma.nome, turma.sala, DataUtil.horarioDeBrasiliaISOComHorario()]);
+				await sql.query("insert into turma (idescola, ano, serie, nome, sala, idlivro, criacao) values (?, ?, ?, ?, ?, ?, ?)", [turma.idescola, turma.ano, turma.serie, turma.nome, turma.sala, turma.idlivro, DataUtil.horarioDeBrasiliaISOComHorario()]);
 			} catch (e) {
 				if (e.code) {
 					switch (e.code) {

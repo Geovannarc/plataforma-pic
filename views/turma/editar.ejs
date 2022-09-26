@@ -31,7 +31,7 @@
 </div>
 
 <div class="row">
-	<div class="col-sm-6">
+	<div class="col-sm-4">
 		<label for="idescola">Escola</label>
 		<div class="form-group">
 			<div class="cb-search">
@@ -45,10 +45,21 @@
 		</div>
 	</div>
 
-	<div class="col-sm-6">
+	<div class="col-sm-4">
 		<div class="form-group">
 			<label for="nome">Nome</label>
 			<input id="nome" name="nome" class="form-control" type="text" maxlength="100" value="<%=(item ? item.nome : "") %>" />
+		</div>
+	</div>
+	<div class="col-sm-4">
+		<div class="form-group">
+			<label for="idlivro">Livro</label>
+			<select id="idlivro" name="idlivro" class="form-control" size="1">
+				<option value="">Selecione...</option>
+				<% for (let i = 0; i < livros.length; i++) { %>
+				<option value="<%= livros[i].id %>" <%-((item && item.idlivro === livros[i].id) ? 'selected="selected"' : '') %>><%= livros[i].nome %></option>
+				<% } %>
+			</select> 
 		</div>
 	</div>
 </div>

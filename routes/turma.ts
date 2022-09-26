@@ -1,6 +1,7 @@
 import app = require("teem");
 import appsettings = require("../appsettings");
 import Escola = require("../models/escola");
+import livros = require("../models/livro");
 import Turma = require("../models/turma");
 import Usuario = require("../models/usuario");
 
@@ -19,7 +20,8 @@ class TurmaRoute {
 				item: null,
 				ano: hoje.getFullYear(),
 				usuarios: await Usuario.listarCombo(),
-				escolas: await Escola.listarCombo()
+				escolas: await Escola.listarCombo(),
+				livros: livros.lista
 			});
 		}
 	}
