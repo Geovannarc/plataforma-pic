@@ -45,7 +45,8 @@ class TurmaRoute {
 					usuario: u,
 					item,
 					usuarios: await Usuario.listarCombo(),
-					escolas: await Escola.listarCombo()
+					escolas: await Escola.listarCombo(),
+					livros: livros.lista
 				});
 		}
 	}
