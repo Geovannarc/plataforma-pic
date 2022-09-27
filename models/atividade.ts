@@ -1,6 +1,7 @@
 
 import app = require("teem");
 import DataUtil = require("../utils/dataUtil");
+import Turma = require("./turma");
 
 interface Atividade {
 	id: number;
@@ -56,66 +57,6 @@ class Atividade {
 			const atividade = (lista && lista[0]) || null;
 
 			return atividade;
-		});
-	}
-
-	private static async atividadePertenceATurma(sql: app.Sql, id: number, idturma: number): Promise<boolean> {
-		// ver depois se a atividade pertence a turma (metodo separado para aproveitar)
-		return false;
-	}
-
-	public static async liberar(id: number, idturma: number, idusuario: number, admin: boolean): Promise<string | null> {
-		return app.sql.connect(async (sql) => {
-			try {
-				// validar se a atividade id tem idlivro igual ao idlivro da turma
-				if(!admin){
-					const professor = await validarProfessor(idturma, idusuario, admin);
-					if(professor === 0){
-						return "Sem permissão."
-					}
-				}
-				
-				await sql.query("insert into turma_atividade_liberada (idatividade, idturma) values (?, ?)", [id,idturma]);
-
-				return null;
-				
-			} catch (e) {
-				if (e.code) {
-					switch (e.code) {
-						case "ER_DUP_ENTRY":
-							return "Essa atividade já está liberada.";
-						case "ER_NO_REFERENCED_ROW":
-						case "ER_NO_REFERENCED_ROW_2":
-							return "Atividade ou turma não encontrada";
-						default:
-							throw e;
-					}
-				} else {
-					throw e;
-				}
-			}
-		});
-	}
-
-	public static async bloquear(idatividade_liberada: number, idturma: number, idusuario: number, admin: boolean): Promise<string | null> {
-		if (!idturma || !idusuario || !idatividade_liberada)
-			return "Dados inválidos";
-		return app.sql.connect(async (sql) => {
-			if(!admin){
-				const professor = await validarProfessor(idturma, idusuario, admin);
-				if(professor === 0){
-					return "Sem permissão."
-				}
-			}
-
-			// @@@ validar se a atividade id tem idlivro igual ao idlivro da turma
-
-			await sql.query("delete from turma_atividade_liberada where id = ?", [idatividade_liberada]);
-
-			if (!sql.affectedRows)
-				return "Atividade não encontrada ou já estava bloqueada";
-
-			return null;
 		});
 	}
 
@@ -214,18 +155,65 @@ class Atividade {
 			return (sql.affectedRows ? null : "Atividade não encontrada");
 		});
 	}
+
+	public static async pertenceATurma(sql: app.Sql, id: number, idturma: number): Promise<boolean> {
+		const idturmaCheck = await sql.scalar("select t.id from turma t inner join atividade a on a.id = ? and a.idlivro = t.idlivro where t.id = ?", [id, idturma]) as number | null;
+
+		return !!idturmaCheck;
+	}
+
+	public static async liberar(id: number, idturma: number, idusuario: number, admin: boolean): Promise<string | null> {
+		if (!id || !idturma)
+			return "Dados inválidos";
+
+		return app.sql.connect(async (sql) => {
+			try {
+				if (!await Turma.usuarioPodeAlterar(sql, idturma, idusuario, admin))
+					return "Sem permissão";
+
+				if (!await Atividade.pertenceATurma(sql, id, idturma))
+					return "Atividade não encontrada na turma";
+
+				await sql.query("insert into turma_atividade_liberada (idatividade, idturma) values (?, ?)", [id, idturma]);
+
+				return null;
+			} catch (e) {
+				if (e.code) {
+					switch (e.code) {
+						case "ER_DUP_ENTRY":
+							return "Essa atividade já está liberada.";
+						case "ER_NO_REFERENCED_ROW":
+						case "ER_NO_REFERENCED_ROW_2":
+							return "Atividade ou turma não encontrada";
+						default:
+							throw e;
+					}
+				} else {
+					throw e;
+				}
+			}
+		});
+	}
+
+	public static async bloquear(id: number, idturma: number, idusuario: number, admin: boolean): Promise<string | null> {
+		if (!id || !idturma)
+			return "Dados inválidos";
+
+		return app.sql.connect(async (sql) => {
+			if (!await Turma.usuarioPodeAlterar(sql, idturma, idusuario, admin))
+				return "Sem permissão";
+
+			if (!await Atividade.pertenceATurma(sql, id, idturma))
+				return "Atividade não encontrada na turma";
+
+			await sql.query("delete from turma_atividade_liberada where idatividade = ? and idturma = ?", [id, idturma]);
+
+			if (!sql.affectedRows)
+				return "Atividade não encontrada ou já estava bloqueada";
+
+			return null;
+		});
+	}
 };
-
-async function validarProfessor(idturma: number, idusuario: number, admin: boolean) {
-	return app.sql.connect(async (sql) => {
-		if (!admin) {
-			const lista: number[] = await sql.query("select professor from turma_usuario where idturma = ? and idusuario = ?", [idturma, idusuario]);
-			
-			const professor = ((lista && lista[0]) || null);
-
-			return professor;
-		}
-	});
-}
 
 export = Atividade;

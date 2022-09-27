@@ -23,7 +23,7 @@
 		<div class="card-body">
 			<div class="row no-gutters align-items-center">
 				<div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">Capítulo <%= atividades[i].capitulo %></div>
+					<div class="h5 mb-0 font-weight-bold text-gray-800">Capítulo <%= atividades[i].capitulo %></div>
 					<div class="text-xs font-weight-bold text-<%- cor %> text-uppercase mb-1"><%= atividades[i].nome %></div>
 				</div>
 				<div class="col-auto">
@@ -35,7 +35,7 @@
 
 			<button type="button" id="liberar<%- atividades[i].id %>" onclick="liberar(<%- atividades[i].id %>)" class="btn btn-sm btn-outline-<%- cor %> <%- (atividades[i].idliberacao ? 'hidden' : '') %>">Liberar Atividade</button>
 
-			<button type="button" id="bloquear<%- atividades[i].id %>" onclick="bloquear(<%- atividades[i].idliberacao %>,<%- atividades[i].id %>)" class="btn btn-sm btn-outline-<%- cor %> <%- (atividades[i].idliberacao ? '' : 'hidden') %>">Bloquear Atividade</button>
+			<button type="button" id="bloquear<%- atividades[i].id %>" onclick="bloquear(<%- atividades[i].id %>)" class="btn btn-sm btn-outline-<%- cor %> <%- (atividades[i].idliberacao ? '' : 'hidden') %>">Bloquear Atividade</button>
 		</div>
 	</div>
 </div>
@@ -49,49 +49,47 @@
 <%- contentFor("scripts") %>
 
 <script>
-    let idturma = parseInt("<%- idturma %>");
+	let idturma = parseInt("<%- idturma %>");
 
-    function liberar(idatividade) {
-        alert(idturma + " / " + idatividade);
-        document.getElementById("liberar" + idatividade).classList.add("hidden");
-        document.getElementById("bloquear" + idatividade).classList.remove("hidden");
-        body = {idatividade, idturma};
-        console.log(body)
-        liberarReq(body);
-    }
+	function liberar(idatividade) {
+		if (JsonWebApi.active)
+			return;
 
-    function liberarReq(body){
-        if (JsonWebApi.active)
-				return;
+		Swal.wait();
 
-			Swal.wait();
+		JsonWebApi.post("<%- root %>/api/atividade/liberar", {
+			idatividade,
+			idturma
+		}, function (response) {
+			if (response.success) {
+				Swal.success("Atividade liberada com sucesso! " + emoji.happy);
 
-			JsonWebApi.post("<%- root %>/api/atividade/liberar", body, function (response) {
-				if (response.success)
-					Swal.success("Atividade liberada com sucesso! " + emoji.happy);
-				else
-					Swal.error(response.value + " " + emoji.sad);
-			});
-    }
+				document.getElementById("liberar" + idatividade).classList.add("hidden");
+				document.getElementById("bloquear" + idatividade).classList.remove("hidden");
+			} else {
+				Swal.error(response.value + " " + emoji.sad);
+			}
+		});
+	}
 
-    function bloquear(idliberacao, idatividade) {
-        alert(idturma + " / " + idatividade);
-        document.getElementById("liberar" + idatividade).classList.remove("hidden");
-        document.getElementById("bloquear" + idatividade).classList.add("hidden");
-        bloquearReq(idliberacao)
-    }
+	function bloquear(idatividade) {
+		if (JsonWebApi.active)
+			return;
 
-    function bloquearReq(idliberacao){
-        if (JsonWebApi.active)
-				return;
+		Swal.wait();
 
-			Swal.wait();
+		JsonWebApi.delete("<%- root %>/api/atividade/bloquear", function (response) {
+			if (response.success) {
+				Swal.success("Atividade bloqueada com sucesso! " + emoji.happy);
 
-			JsonWebApi.delete("<%- root %>/api/atividade/bloquear", function (response) {
-				if (response.success)
-					Swal.success("Atividade bloqueada com sucesso! " + emoji.happy);
-				else
-					Swal.error(response.value + " " + emoji.sad);
-			}, "id", idliberacao, "idturma", idturma);
-    }
+				document.getElementById("liberar" + idatividade).classList.remove("hidden");
+				document.getElementById("bloquear" + idatividade).classList.add("hidden");
+			} else {
+				Swal.error(response.value + " " + emoji.sad);
+			}
+		}, "idatividade", idatividade, "idturma", idturma);
+	}
+
+	function bloquearReq(idliberacao){
+	}
 </script>

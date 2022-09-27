@@ -115,16 +115,7 @@ class AtividadeApiRoute {
 			return;
 		}
 
-		const idatividade_liberada = parseInt(req.query["id"] as string);
-
-		const idturma = parseInt(req.query["idturma"] as string);
-
-		if (isNaN(idatividade_liberada)) {
-			res.status(400).json("Id inválido");
-			return;
-		}
-
-		const erro = await Atividade.bloquear(idatividade_liberada, idturma, u.id, u.admin);
+		const erro = await Atividade.bloquear(parseInt(req.query["idatividade"] as string), parseInt(req.query["idturma"] as string), u.id, u.admin);
 
 		if (erro) {
 			res.status(400).json(erro);

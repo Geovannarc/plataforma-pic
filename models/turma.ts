@@ -272,6 +272,15 @@ class Turma {
 			return (sql.affectedRows ? null : "Turma não encontrada");
 		});
 	}
+
+	public static async usuarioPodeAlterar(sql: app.Sql, id: number, idusuario: number, admin: boolean): Promise<boolean> {
+		if (admin)
+			return true;
+
+		const professor = await sql.scalar("select professor from turma_usuario where idturma = ? and idusuario = ?", [id, idusuario]) as number | null;
+
+		return !!professor;
+	}
 };
 
 export = Turma;
