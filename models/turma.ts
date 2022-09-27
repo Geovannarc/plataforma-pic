@@ -90,6 +90,12 @@ class Turma {
 		});
 	}
 
+	public static listarAtividades(idturma: number): Promise<Turma[]> {
+		return app.sql.connect(async (sql) => {
+			return (await sql.query("select a.id, a.capitulo, a.idsecao, a.nome, a.url, al.id idliberacao from turma t inner join atividade a on a.idlivro = t.idlivro left join turma_atividade_liberada al on al.idturma = t.id and al.idatividade = a.id where t.id = ? order by a.capitulo, a.idsecao", [idturma])) || [];
+		});
+	}
+
 	public static obter(id: number): Promise<Turma> {
 		return app.sql.connect(async (sql) => {
 			const lista: Turma[] = await sql.query("select id, idescola, idlivro, ano, serie, nome, sala from turma where id = ? and exclusao is null", [id]);

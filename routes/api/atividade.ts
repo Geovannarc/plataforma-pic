@@ -1,4 +1,5 @@
 import app = require("teem");
+import Perfil = require("../../enums/perfil");
 import Atividade = require("../../models/atividade");
 import Usuario = require("../../models/usuario");
 
@@ -68,6 +69,62 @@ class AtividadeApiRoute {
 		}
 
 		const erro = await Atividade.registrarTentativa(parseInt(req.body.idturma), u.id, parseInt(req.body.idatividade), parseInt(req.body.nota));
+
+		if (erro) {
+			res.status(400).json(erro);
+			return;
+		}
+
+		res.sendStatus(204);
+	}
+
+	@app.http.post()
+	public static async liberar(req: app.Request, res: app.Response) {
+		const u = await Usuario.cookie(req, res);
+		if (!u)
+			return;
+
+		if (u.idperfil === Perfil.Aluno) {
+			res.status(403).json("Não permitido");
+			return;
+		}
+
+		if (!req.body) {
+			res.status(400).json("Dados inválidos");
+			return;
+		}
+
+		const erro = await Atividade.liberar(parseInt(req.body.idatividade), parseInt(req.body.idturma), u.id, u.admin);
+
+		if (erro) {
+			res.status(400).json(erro);
+			return;
+		}
+
+		res.sendStatus(204);
+	}
+
+	@app.http.delete()
+	public static async bloquear(req: app.Request, res: app.Response) {
+		const u = await Usuario.cookie(req, res);
+		if (!u)
+			return;
+
+		if (u.idperfil === Perfil.Aluno) {
+			res.status(403).json("Não permitido");
+			return;
+		}
+
+		const idatividade_liberada = parseInt(req.query["id"] as string);
+
+		const idturma = parseInt(req.query["idturma"] as string);
+
+		if (isNaN(idatividade_liberada)) {
+			res.status(400).json("Id inválido");
+			return;
+		}
+
+		const erro = await Atividade.bloquear(idatividade_liberada, idturma, u.id, u.admin);
 
 		if (erro) {
 			res.status(400).json(erro);

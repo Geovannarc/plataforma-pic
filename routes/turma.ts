@@ -1,5 +1,6 @@
 import app = require("teem");
 import appsettings = require("../appsettings");
+import Perfil = require("../enums/perfil");
 import Escola = require("../models/escola");
 import livros = require("../models/livro");
 import Turma = require("../models/turma");
@@ -61,6 +62,23 @@ class TurmaRoute {
 				usuario: u,
 				lista: await Turma.listar()
 			});
+	}
+
+	public static async alterar(req: app.Request, res: app.Response) {
+		let u = await Usuario.cookie(req);
+		if (!u || u.idperfil === Perfil.Aluno )
+			res.redirect(app.root + "/acesso");
+		else{
+			let id = parseInt(req.query["id"] as string);
+			res.render("turma/alterar", {
+				layout: "layout-sem-form",
+				titulo: "Gerenciar Turma",
+				datatables: true,
+				usuario: u,
+				idturma: id,
+				atividades: await Turma.listarAtividades(id)
+			});
+		}
 	}
 
 	public static async index(req: app.Request, res: app.Response) {
