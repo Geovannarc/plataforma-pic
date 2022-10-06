@@ -65,6 +65,16 @@ class TurmaApiRoute {
 
 		res.json(await Turma.situacaoPorProfessor(ano || (new Date()).getFullYear(), u.id));
 	}
+
+	public static async situacaoPorAluno(req: app.Request, res: app.Response) {
+		const u = await Usuario.cookie(req, res);
+		if (!u)
+			return;
+
+		const ano = parseInt(req.query["ano"] as string);
+
+		res.json(await Turma.situacaoPorAluno(ano || (new Date()).getFullYear(), u.id));
+	}
 }
 
 export = TurmaApiRoute;

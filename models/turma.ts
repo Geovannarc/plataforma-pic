@@ -25,6 +25,42 @@ interface Turma {
 	professores?: number[];
 }
 
+interface SituacaoAtividadeTurmaProfessor {
+	nome: string;
+	serie: number;
+	sala: string;
+	idturma: number;
+	aprovadas: number;
+	qtdeatividades: number;
+	qtdeliberadas: number;
+	qtdealunos: number;
+	total: number;
+	faltantes: number;
+	percliberadas: number;
+	percaprovadas: number;
+	percfaltantes: number;
+}
+
+interface SituacaoProfessor {
+	qtdealunos: number;
+	qtdeturmas: number;
+	situacao: SituacaoAtividadeTurmaProfessor[];
+}
+
+interface SituacaoAluno {
+	nome: string;
+	serie: number;
+	sala: string;
+	idturma: number;
+	aprovadas: number;
+	qtdeatividades: number;
+	qtdeliberadas: number;
+	faltantes: number;
+	percliberadas: number;
+	percaprovadas: number;
+	percfaltantes: number;
+}
+
 class Turma {
 	private static validar(turma: Turma): string | null {
 		if (!turma)
@@ -282,11 +318,12 @@ class Turma {
 		return !!professor;
 	}
 
-	public static async situacaoPorProfessor(ano: number, idprofessor: number): Promise<any[]> {
+	public static async situacaoPorProfessor(ano: number, idprofessor: number): Promise<SituacaoProfessor> {
 		return app.sql.connect(async (sql) => {
-			return await sql.query(`
+			const situacao: SituacaoAtividadeTurmaProfessor[] = await sql.query(`
 select t.nome, t.serie, t.sala, atividadesaprovadas.idturma, atividadesaprovadas.aprovadas,
 	atividadesporturma.qtde qtdeatividades,
+	atividadesliberadasporturma.qtde qtdeliberadas,
 	alunosporturma.qtde qtdealunos,
 	atividadesporturma.qtde * alunosporturma.qtde total,
 	(atividadesporturma.qtde * alunosporturma.qtde) - atividadesaprovadas.aprovadas faltantes
@@ -318,8 +355,94 @@ inner join
 	where t.ano = ?
     group by t.id
 ) alunosporturma on alunosporturma.idturma = atividadesaprovadas.idturma
+inner join
+(
+	select t.id idturma, count(tal.id) qtde
+	from turma t
+	inner join turma_usuario tu on tu.idturma = t.id and tu.idusuario = ? and tu.professor = 1
+	left join turma_atividade_liberada tal on tal.idturma = tu.idturma
+	where t.ano = ?
+    group by t.id
+) atividadesliberadasporturma on atividadesliberadasporturma.idturma = atividadesaprovadas.idturma
 inner join turma t on t.id = atividadesaprovadas.idturma
-`, [idprofessor, ano, idprofessor, ano, idprofessor, ano]);
+`, [idprofessor, ano, idprofessor, ano, idprofessor, ano, idprofessor, ano]) || [];
+
+			let qtdealunos = 0;
+			for (let i = situacao.length - 1; i >= 0; i--) {
+				qtdealunos += situacao[i].qtdealunos;
+				if (situacao[i].total) {
+					situacao[i].percaprovadas = Math.round(100 * situacao[i].aprovadas / situacao[i].total);
+					situacao[i].percfaltantes = 100 - situacao[i].percaprovadas;
+				} else {
+					situacao[i].percaprovadas = 0;
+					situacao[i].percfaltantes = 0;
+				}
+
+				if (situacao[i].qtdeatividades) {
+					situacao[i].percliberadas = Math.round(100 * situacao[i].qtdeliberadas / situacao[i].qtdeatividades);
+				} else {
+					situacao[i].percliberadas = 0;
+				}
+			}
+
+			return {
+				qtdeturmas: situacao.length,
+				qtdealunos,
+				situacao
+			};
+		});
+	}
+
+	public static async situacaoPorAluno(ano: number, idaluno: number): Promise<SituacaoAluno> {
+		return app.sql.connect(async (sql) => {
+			const situacao: SituacaoAluno[] = await sql.query(`
+select t.nome, t.serie, t.sala, atividadesaprovadas.idturma, atividadesaprovadas.aprovadas,
+	atividadesporturma.qtde qtdeatividades,
+    atividadesliberadasporturma.qtde qtdeliberadas,
+	atividadesliberadasporturma.qtde - atividadesaprovadas.aprovadas faltantes
+from
+(
+	select t.id idturma, count(tua.id) aprovadas
+	from turma t
+	inner join turma_usuario tu on tu.idturma = t.id and tu.idusuario = ? and tu.professor = 0
+	left join turma_usuario_atividade tua on tua.idturma_usuario = tu.id and tua.aprovado = 1
+	where t.ano = ?
+    group by t.id
+) atividadesaprovadas
+inner join
+(
+	select t.id idturma, count(*) qtde
+	from turma t
+	inner join turma_usuario tu on tu.idturma = t.id and tu.idusuario = ? and tu.professor = 0
+	inner join atividade a on a.idlivro = t.idlivro
+	where t.ano = ?
+    group by t.id
+) atividadesporturma on atividadesporturma.idturma = atividadesaprovadas.idturma
+inner join
+(
+	select t.id idturma, count(tal.id) qtde
+	from turma t
+	inner join turma_usuario tu on tu.idturma = t.id and tu.idusuario = ? and tu.professor = 0
+	left join turma_atividade_liberada tal on tal.idturma = tu.idturma
+	where t.ano = ?
+    group by t.id
+) atividadesliberadasporturma on atividadesliberadasporturma.idturma = atividadesaprovadas.idturma
+inner join turma t on t.id = atividadesaprovadas.idturma
+`, [idaluno, ano, idaluno, ano, idaluno, ano]) || [];
+
+			for (let i = situacao.length - 1; i >= 0; i--) {
+				if (situacao[i].qtdeatividades) {
+					situacao[i].percliberadas = Math.round(100 * situacao[i].qtdeliberadas / situacao[i].qtdeatividades);
+					situacao[i].percaprovadas = Math.round(100 * situacao[i].aprovadas / situacao[i].qtdeliberadas);
+					situacao[i].percfaltantes = 100 - situacao[i].percaprovadas;
+				} else {
+					situacao[i].percliberadas = 0;
+					situacao[i].percaprovadas = 0;
+					situacao[i].percfaltantes = 0;
+				}
+			}
+
+			return situacao[0] || null;
 		});
 	}
 };
