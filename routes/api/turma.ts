@@ -75,6 +75,14 @@ class TurmaApiRoute {
 
 		res.json(await Turma.situacaoPorAluno(ano || (new Date()).getFullYear(), u.id));
 	}
+
+	public static async notas(req: app.Request, res: app.Response) {
+		const u = await Usuario.cookie(req, res);
+		if (!u)
+			return;
+
+		res.json(await Turma.notasAluno(u.id));
+	}
 }
 
 export = TurmaApiRoute;

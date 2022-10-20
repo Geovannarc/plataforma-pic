@@ -61,6 +61,15 @@ interface SituacaoAluno {
 	percfaltantes: number;
 }
 
+interface SituacaoAtividadesAluno {
+	turma: string;
+	atividade: string;
+	capitulo: number;
+	idsecao: number;
+	aprovado: number;
+	conclusao: string;
+}
+
 class Turma {
 	private static validar(turma: Turma): string | null {
 		if (!turma)
@@ -444,6 +453,25 @@ inner join turma t on t.id = atividadesaprovadas.idturma
 
 			return situacao[0] || null;
 		});
+	}
+
+	public static async notasAluno(idaluno: number): Promise<SituacaoAtividadesAluno[]>{
+		return app.sql.connect(async (sql) => {
+			const situacao:SituacaoAtividadesAluno[] = await sql.query(`select turma.nome turma, atividade.nome atividade, atividade.capitulo, atividade.idsecao, turma_usuario_atividade.aprovado, turma_usuario_atividade.conclusao
+			from
+			turma_usuario
+			inner join
+			usuario on turma_usuario.idusuario = usuario.id
+			inner join
+			turma_usuario_atividade on turma_usuario.id = turma_usuario_atividade.idturma_usuario
+			inner join
+			atividade on turma_usuario_atividade.idatividade = atividade.id
+			inner join
+			turma on turma_usuario.idturma = turma.id
+			where
+			turma_usuario.idusuario = ?`,[idaluno]);
+			return situacao;
+		})
 	}
 };
 

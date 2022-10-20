@@ -1,1 +1,22 @@
-<div class="alert alert-danger text-center">Você ainda não possui notas 😢</div>
+<table class="table table-flush table-striped table-hover" id="tabela"></table>
+
+<%- contentFor("scripts") %>
+<script type="text/javascript">
+	//<![CDATA[
+	"use strict";
+
+	var tabela = prepareDataTable("tabela", {
+		order: [[1, "asc"]],
+		deferRender: true,
+		columns: [
+			{ title: "Atividade", render: encode, data: "atividade" },
+			{ title: "Capítulo", data: "capitulo" },
+			{ title: "Seção", data: "idsecao" },
+			{ title: "Aprovado", data: "aprovado" },
+			{ title: "Conclusão", "class": "col-min text-right", "type": "customdateint", data: "conclusao" }
+		],
+		data: <%- JSON.stringify(lista) %>,
+		export: { title: "Notas" }
+	});
+    
+</script>

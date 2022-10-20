@@ -1,5 +1,7 @@
 ﻿import app = require("teem");
-import { ids } from "../models/perfil";
+import Perfil = require("../enums/perfil");
+import { ids, lista } from "../models/perfil";
+import Turma = require("../models/turma");
 import Usuario = require("../models/usuario");
 
 class IndexRoute {
@@ -8,17 +10,19 @@ class IndexRoute {
 		if (!u)
 			res.redirect(app.root + "/login");
 		else
-		if(u.idperfil !== 3){
+		if(u.idperfil == Perfil.Professor || u.idperfil == Perfil.Administrador){
 			res.render("index/index", {
 				layout: "layout-sem-form",
 				titulo: "Dashboard",
-				usuario: u
+				usuario: u,
+				lista: await Turma.situacaoPorProfessor(2022, u.id)
 			});
 		}else{
 			res.render("index/menu", {
 				layout: "menu",
 				titulo: "",
-				usuario: u
+				usuario: u,
+				lista: await Turma.situacaoPorAluno(2022, u.id)
 			});
 		}
 	}
@@ -40,15 +44,17 @@ class IndexRoute {
 		if (!u)
 			res.redirect(app.root + "/acesso");
 		else{
-			let id = parseInt(req.query["id"] as string);
-			let item: Usuario = null;
+			if(u.idperfil == Perfil.Aluno){
 			res.render("index/notas", {
 				layout: "layout-tabela",
-				titulo: "Mensagens",
+				titulo: "Notas",
+				datatables: true,
 				usuario: u,
-				item,
-				id: id
+				lista: await Turma.notasAluno(u.id)
 			});
+		}else{
+			res.redirect(app.root + "/acesso");
+		}
 		}
 	}
 
