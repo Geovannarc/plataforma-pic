@@ -330,7 +330,7 @@ class Turma {
 	public static async situacaoPorProfessor(ano: number, idprofessor: number): Promise<SituacaoProfessor> {
 		return app.sql.connect(async (sql) => {
 			const situacao: SituacaoAtividadeTurmaProfessor[] = await sql.query(`
-			select t.nome, t.serie, t.sala, atividadesaprovadas.idturma, atividadesaprovadas.aprovadas,
+		select t.nome, t.serie, t.sala, atividadesaprovadas.idturma, atividadesaprovadas.aprovadas,
 			atividadesporturma.qtde qtdeatividades,
 			atividadesliberadasporturma.qtde qtdeliberadas,
 			alunosporturma.qtde qtdealunos,
@@ -341,12 +341,12 @@ class Turma {
 			select t.id idturma, count(tua.id) aprovadas
 			from turma t
 			inner join turma_usuario tu on tu.idturma = t.id and tu.idusuario = ? and tu.professor = 1
-			left join turma_usuario ta on ta.idturma = t.id and ta.professor = 0
+			inner join turma_usuario ta on ta.idturma = t.id and ta.professor = 0
 			left join turma_usuario_atividade tua on tua.idturma_usuario = ta.id and tua.aprovado = 1
 			where t.ano = ?
 			group by t.id
 		) atividadesaprovadas
-		left join
+		inner join
 		(
 			select t.id idturma, count(*) qtde
 			from turma t
@@ -355,7 +355,7 @@ class Turma {
 			where t.ano = ?
 			group by t.id
 		) atividadesporturma on atividadesporturma.idturma = atividadesaprovadas.idturma
-		left join
+		inner join
 		(
 			select t.id idturma, count(*) qtde
 			from turma t
@@ -364,7 +364,7 @@ class Turma {
 			where t.ano = ?
 			group by t.id
 		) alunosporturma on alunosporturma.idturma = atividadesaprovadas.idturma
-		left join
+		inner join
 		(
 			select t.id idturma, count(tal.id) qtde
 			from turma t
@@ -373,7 +373,8 @@ class Turma {
 			where t.ano = ?
 			group by t.id
 		) atividadesliberadasporturma on atividadesliberadasporturma.idturma = atividadesaprovadas.idturma
-		inner join turma t on t.id = atividadesaprovadas.idturma`, [idprofessor, ano, idprofessor, ano, idprofessor, ano, idprofessor, ano]) || [];
+		inner join turma t on t.id = atividadesaprovadas.idturma
+		`, [idprofessor, ano, idprofessor, ano, idprofessor, ano, idprofessor, ano]) || [];
 
 			let qtdealunos = 0;
 			for (let i = situacao.length - 1; i >= 0; i--) {
