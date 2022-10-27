@@ -21,8 +21,7 @@ class IndexRoute {
 			res.render("index/menu", {
 				layout: "menu",
 				titulo: "",
-				usuario: u,
-				lista: await Turma.situacaoPorAluno(2022, u.id)
+				usuario: u
 			});
 		}
 	}
@@ -50,7 +49,8 @@ class IndexRoute {
 				titulo: "Notas",
 				datatables: true,
 				usuario: u,
-				lista: await Turma.notasAluno(u.id)
+				lista: await Turma.notasAluno(u.id),
+				dados: await Turma.situacaoPorAluno(2022, u.id)
 			});
 		}else{
 			res.redirect(app.root + "/acesso");

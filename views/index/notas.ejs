@@ -1,11 +1,117 @@
-<table class="table table-flush table-striped table-hover" id="tabela"></table>
+<%
+let cores = [
+	"primary",
+	"success",
+	"info",
+	"warning",
+	"secondary",
+	"danger",
+	"dark"
+];
+%>
+<div class="row">
+
+	<div class="col-xl-3 col-md-6 mb-4">
+		<div class="card border-left-primary shadow h-100 py-2">
+			<div class="card-body">
+				<div class="row no-gutters align-items-center">
+					<div class="col mr-2">
+						<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+							Total de atividades</div>
+						<div class="h5 mb-0 font-weight-bold text-gray-800">
+							<%-dados.qtdeatividades%>
+						</div>
+					</div>
+					<div class="col-auto">
+						<i class="fas fa-calendar fa-2x text-gray-300"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="col-xl-3 col-md-6 mb-4">
+		<div class="card border-left-success shadow h-100 py-2">
+			<div class="card-body">
+				<div class="row no-gutters align-items-center">
+					<div class="col mr-2">
+						<div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+							Atividades liberadas</div>
+						<div class="h5 mb-0 font-weight-bold text-gray-800">
+							<%-dados.qtdeliberadas%>
+							</div>
+					</div>
+					<div class="col-auto">
+						<i class="fas fa-users fa-2x text-gray-300"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-xl-3 col-md-6 mb-4">
+		<div class="card border-left-secondary shadow h-100 py-2">
+			<div class="card-body">
+				<div class="row no-gutters align-items-center">
+					<div class="col mr-2">
+						<div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+							Atividades aprovadas</div>
+						<div class="h5 mb-0 font-weight-bold text-gray-800">
+							<%-dados.aprovadas%>
+						</div>
+					</div>
+					<div class="col-auto">
+						<i class="fas fa-users fa-2x text-gray-300"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-xl-3 col-md-6 mb-4">
+		<div class="card border-left-warning shadow h-100 py-2">
+			<div class="card-body">
+				<div class="row no-gutters align-items-center">
+					<div class="col mr-2">
+						<div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+							Faltantes</div>
+						<div class="h5 mb-0 font-weight-bold text-gray-800"><%-dados.faltantes%></div>
+					</div>
+					<div class="col-auto">
+						<i class="fas fa-comments fa-2x text-gray-300"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%for(let i = 0; i<lista.length; i++){%>
+	<%if(i%2 == 0){%>
+	<div class="row">
+	<%}%>
+		<div class="col-sm-6">
+			<div class="card shadow mb-4">
+				<div class="card-header">
+					Atividades - Capítulo <%=lista[i].capitulo%>
+				</div>
+				<div class="card-body">
+				<table class="table table-flush table-striped table-hover" id="tabela<%-i%>"></table>
+				</div>
+			</div>
+		</div>
+	<%if(i%2 == 1){%>
+	</div>
+	<%}%>
+<%}%>
 
 <%- contentFor("scripts") %>
 <script type="text/javascript">
 	//<![CDATA[
 	"use strict";
-
-	var tabela = prepareDataTable("tabela", {
+// ver como separa as listas por capítulo sem usar query
+for(let i = 0; i<12; i++){
+	prepareDataTable(`tabela${i}`, {
 		order: [[1, "asc"]],
 		deferRender: true,
 		columns: [
@@ -18,5 +124,6 @@
 		data: <%- JSON.stringify(lista) %>,
 		export: { title: "Notas" }
 	});
+}
     
 </script>
