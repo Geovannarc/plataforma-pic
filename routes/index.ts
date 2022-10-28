@@ -45,12 +45,12 @@ class IndexRoute {
 		else{
 			if(u.idperfil == Perfil.Aluno){
 			res.render("index/notas", {
-				layout: "layout-tabela",
+				layout: "layout-sem-form",
 				titulo: "Notas",
 				datatables: true,
 				usuario: u,
-				lista: await Turma.notasAluno(u.id),
-				dados: await Turma.situacaoPorAluno(2022, u.id)
+				notas: await Turma.notasAluno(u.id),
+				situacao: await Turma.situacaoPorAluno(2022, u.id)
 			});
 		}else{
 			res.redirect(app.root + "/acesso");

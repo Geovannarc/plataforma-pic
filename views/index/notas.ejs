@@ -19,7 +19,7 @@ let cores = [
 						<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
 							Total de atividades</div>
 						<div class="h5 mb-0 font-weight-bold text-gray-800">
-							<%-dados.qtdeatividades%>
+							<%-situacao.qtdeatividades%>
 						</div>
 					</div>
 					<div class="col-auto">
@@ -39,7 +39,7 @@ let cores = [
 						<div class="text-xs font-weight-bold text-success text-uppercase mb-1">
 							Atividades liberadas</div>
 						<div class="h5 mb-0 font-weight-bold text-gray-800">
-							<%-dados.qtdeliberadas%>
+							<%-situacao.qtdeliberadas%>
 							</div>
 					</div>
 					<div class="col-auto">
@@ -58,7 +58,7 @@ let cores = [
 						<div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
 							Atividades aprovadas</div>
 						<div class="h5 mb-0 font-weight-bold text-gray-800">
-							<%-dados.aprovadas%>
+							<%-situacao.aprovadas%>
 						</div>
 					</div>
 					<div class="col-auto">
@@ -76,7 +76,7 @@ let cores = [
 					<div class="col mr-2">
 						<div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
 							Faltantes</div>
-						<div class="h5 mb-0 font-weight-bold text-gray-800"><%-dados.faltantes%></div>
+						<div class="h5 mb-0 font-weight-bold text-gray-800"><%-situacao.faltantes%></div>
 					</div>
 					<div class="col-auto">
 						<i class="fas fa-comments fa-2x text-gray-300"></i>
@@ -86,44 +86,89 @@ let cores = [
 		</div>
 	</div>
 </div>
-<%for(let i = 0; i<lista.length; i++){%>
-	<%if(i%2 == 0){%>
-	<div class="row">
-	<%}%>
-		<div class="col-sm-6">
-			<div class="card shadow mb-4">
-				<div class="card-header">
-					Atividades - Capítulo <%=lista[i].capitulo%>
-				</div>
-				<div class="card-body">
-				<table class="table table-flush table-striped table-hover" id="tabela<%-i%>"></table>
-				</div>
-			</div>
-		</div>
-	<%if(i%2 == 1){%>
-	</div>
-	<%}%>
-<%}%>
+
+<div id="tabelas"></div>
 
 <%- contentFor("scripts") %>
 <script type="text/javascript">
 	//<![CDATA[
 	"use strict";
-// ver como separa as listas por capítulo sem usar query
-for(let i = 0; i<12; i++){
-	prepareDataTable(`tabela${i}`, {
-		order: [[1, "asc"]],
-		deferRender: true,
-		columns: [
-			{ title: "Atividade", render: encode, data: "atividade" },
-			{ title: "Capítulo", data: "capitulo" },
-			{ title: "Seção", data: "idsecao" },
-			{ title: "Aprovado", data: "aprovado" },
-			{ title: "Conclusão", "class": "col-min text-right", "type": "customdateint", data: "conclusao" }
-		],
-		data: <%- JSON.stringify(lista) %>,
-		export: { title: "Notas" }
-	});
-}
-    
+	let notas = <%- JSON.stringify(notas) %>;
+
+	function preparar() {
+		const notasPorCapitulo = new Map()
+
+		for (let i = 0; i < notas.length; i++) {
+			const nota = notas[i];
+			let listaNotas = notasPorCapitulo.get(nota.capitulo);
+			if (!listaNotas) {
+				listaNotas = [];
+				notasPorCapitulo.set(nota.capitulo, listaNotas);
+			}
+			listaNotas.push(nota);
+		}
+
+		const notasPorCapituloOrdenados = [];
+		for (let e of notasPorCapitulo.entries()) {
+			// e = array [0] = chave (capitulo) / [1] = valor (array de notas)
+			notasPorCapituloOrdenados.push(e);
+		}
+
+		notasPorCapituloOrdenados.sort((a, b) => a[0] - b[0]);
+
+		let html = '';
+		let aberto = false;
+
+		for(let i = 0; i<notasPorCapituloOrdenados.length; i++){
+			const item = notasPorCapituloOrdenados[i];
+			const capitulo = item[0];
+
+			if(i%2 == 0){
+				if (aberto)
+					html += '</div>';
+				aberto = true;
+				html += '<div class="row">';
+			}
+			html += `
+			<div class="col-sm-6">
+				<div class="card shadow mb-4">
+					<div class="card-header">
+						Atividades - Capítulo ${capitulo}
+					</div>
+					<div class="card-body px-0">
+					<table class="table table-flush table-striped table-hover" id="tabela${capitulo}"></table>
+					</div>
+				</div>
+			</div>
+			`;
+		}
+
+		if (aberto)
+			html += '</div>';
+
+		document.getElementById("tabelas").innerHTML = html;
+
+		for(let i = 0; i<notasPorCapituloOrdenados.length; i++){
+			const item = notasPorCapituloOrdenados[i];
+			const capitulo = item[0];
+			const notas = item[1];
+
+			prepareDataTable("tabela" + capitulo, {
+				order: [[1, "asc"]],
+				deferRender: true,
+				columns: [
+					{ title: "Atividade", render: encode, data: "atividade" },
+					{ title: "Capítulo", data: "capitulo" },
+					{ title: "Seção", data: "idsecao" },
+					{ title: "Aprovado", data: "aprovado" },
+					{ title: "Conclusão", "class": "col-min text-right", "type": "customdateint", data: "conclusao" }
+				],
+				data: notas,
+				export: { title: "Notas do Capítulo " + capitulo }
+			});
+		}
+	}
+
+	preparar();
+
 </script>
