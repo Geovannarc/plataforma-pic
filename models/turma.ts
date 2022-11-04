@@ -59,6 +59,7 @@ interface SituacaoAluno {
 	percliberadas: number;
 	percaprovadas: number;
 	percfaltantes: number;
+	percrealizadastotal: number;
 }
 
 interface SituacaoAtividadesAluno {
@@ -444,10 +445,12 @@ inner join turma t on t.id = atividadesaprovadas.idturma
 					situacao[i].percliberadas = Math.round(100 * situacao[i].qtdeliberadas / situacao[i].qtdeatividades);
 					situacao[i].percaprovadas = Math.round(100 * situacao[i].aprovadas / situacao[i].qtdeliberadas);
 					situacao[i].percfaltantes = 100 - situacao[i].percaprovadas;
+					situacao[i].percrealizadastotal = Math.round(100 * situacao[i].aprovadas / situacao[i].qtdeatividades);
 				} else {
 					situacao[i].percliberadas = 0;
 					situacao[i].percaprovadas = 0;
 					situacao[i].percfaltantes = 0;
+					situacao[i].percrealizadastotal = 0;
 				}
 			}
 

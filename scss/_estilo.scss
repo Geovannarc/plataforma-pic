@@ -1,31 +1,10 @@
 // Customizações extras :)
-.texto-mapa{
-    display: block;
-    color: #181818;
-    font-weight: 400;
-    font-size: 1.4rem;
-    border: 1px solid #18181863;
-    border-radius: 10px;
-    background-color: #f5f5f557;
-    width: 80%;
-}
-
 .max-w-100{
     max-width: 100%;
 }
 
-.option{
-    width: 100%;
-    list-style: none;
-    font-size: 2rem;
-    text-transform: uppercase;
-    padding: 10px;
-    border: 1px solid;
-    border-radius: 10px;
-    margin-top: 1rem;
-    cursor: pointer;
-}
-
-.option:hover{
-    background-color: rgb(207, 207, 207);
+.bg{
+    background-image: url(../public/img/sistemax.jpg);
+    background-size: cover;
+    min-height: 100vh;
 }

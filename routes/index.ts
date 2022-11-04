@@ -20,8 +20,9 @@ class IndexRoute {
 		}else{
 			res.render("index/menu", {
 				layout: "menu",
-				titulo: "",
-				usuario: u
+				titulo: " ",
+				usuario: u,
+				lista: await Turma.situacaoPorAluno(2022, u.id)
 			});
 		}
 	}
