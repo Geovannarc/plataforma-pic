@@ -16,3 +16,38 @@
     <%- include("caminho") %>
 
 </div>
+
+<%- contentFor("scripts") %>
+<script type="text/javascript">
+	//<![CDATA[
+	"use strict";
+    let liberadas = []
+
+    <% for(let i = 0; i<lista.qtdeliberadas; i++){ %>
+
+        liberadas.push("<%-atividades[i].capitulo%>");
+        
+
+    <%}%>
+
+    for(let i of liberadas){
+        document.getElementById(`cadeado-fechado-${i}`).style.display = "none";
+    }
+
+    <%if(lista.idlivro == 2){%> //melhorar isso
+        let total = ['1', '2', '3', '4', '5']
+    <%} else if(lista.idlivro == 1){%>
+        let total = ['1', '2', '3', '4', '5', '6'] 
+    <%}%>
+
+
+    for(let i of total){
+        if(liberadas.indexOf(i) == -1){
+            document.getElementById(`img-${i}`).style.opacity = "0.4";
+        }
+        if(liberadas.indexOf(total[total.length - 1]) == -1){
+            document.getElementById(`img-6`).style.opacity = "0.4";
+        }
+    }
+
+</script>

@@ -52,6 +52,7 @@ interface SituacaoAluno {
 	serie: number;
 	sala: string;
 	idturma: number;
+	idlivro: number;
 	aprovadas: number;
 	qtdeatividades: number;
 	qtdeliberadas: number;
@@ -406,7 +407,7 @@ class Turma {
 	public static async situacaoPorAluno(ano: number, idaluno: number): Promise<SituacaoAluno> {
 		return app.sql.connect(async (sql) => {
 			const situacao: SituacaoAluno[] = await sql.query(`
-select t.nome, t.serie, t.sala, atividadesaprovadas.idturma, atividadesaprovadas.aprovadas,
+select t.nome, t.serie, t.sala, t.idlivro, atividadesaprovadas.idturma, atividadesaprovadas.aprovadas,
 	atividadesporturma.qtde qtdeatividades,
     atividadesliberadasporturma.qtde qtdeliberadas,
 	atividadesliberadasporturma.qtde - atividadesaprovadas.aprovadas faltantes
