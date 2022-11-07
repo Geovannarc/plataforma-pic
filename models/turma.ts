@@ -53,6 +53,8 @@ interface SituacaoAluno {
 	sala: string;
 	idturma: number;
 	idlivro: number;
+	capitulos: number;
+	livro: string;
 	aprovadas: number;
 	qtdeatividades: number;
 	qtdeliberadas: number;
@@ -407,38 +409,39 @@ class Turma {
 	public static async situacaoPorAluno(ano: number, idaluno: number): Promise<SituacaoAluno> {
 		return app.sql.connect(async (sql) => {
 			const situacao: SituacaoAluno[] = await sql.query(`
-select t.nome, t.serie, t.sala, t.idlivro, atividadesaprovadas.idturma, atividadesaprovadas.aprovadas,
-	atividadesporturma.qtde qtdeatividades,
-    atividadesliberadasporturma.qtde qtdeliberadas,
-	atividadesliberadasporturma.qtde - atividadesaprovadas.aprovadas faltantes
-from
-(
-	select t.id idturma, count(tua.id) aprovadas
-	from turma t
-	inner join turma_usuario tu on tu.idturma = t.id and tu.idusuario = ? and tu.professor = 0
-	left join turma_usuario_atividade tua on tua.idturma_usuario = tu.id and tua.aprovado = 1
-	where t.ano = ?
-    group by t.id
-) atividadesaprovadas
-inner join
-(
-	select t.id idturma, count(*) qtde
-	from turma t
-	inner join turma_usuario tu on tu.idturma = t.id and tu.idusuario = ? and tu.professor = 0
-	inner join atividade a on a.idlivro = t.idlivro
-	where t.ano = ?
-    group by t.id
-) atividadesporturma on atividadesporturma.idturma = atividadesaprovadas.idturma
-inner join
-(
-	select t.id idturma, count(tal.id) qtde
-	from turma t
-	inner join turma_usuario tu on tu.idturma = t.id and tu.idusuario = ? and tu.professor = 0
-	left join turma_atividade_liberada tal on tal.idturma = tu.idturma
-	where t.ano = ?
-    group by t.id
-) atividadesliberadasporturma on atividadesliberadasporturma.idturma = atividadesaprovadas.idturma
-inner join turma t on t.id = atividadesaprovadas.idturma
+			select t.nome, t.serie, t.sala, t.idlivro, livro.capitulos, livro.nome livro, atividadesaprovadas.idturma, atividadesaprovadas.aprovadas,
+			atividadesporturma.qtde qtdeatividades,
+			atividadesliberadasporturma.qtde qtdeliberadas,
+			atividadesliberadasporturma.qtde - atividadesaprovadas.aprovadas faltantes
+		from
+		(
+			select t.id idturma, count(tua.id) aprovadas
+			from turma t
+			inner join turma_usuario tu on tu.idturma = t.id and tu.idusuario = ? and tu.professor = 0
+			left join turma_usuario_atividade tua on tua.idturma_usuario = tu.id and tua.aprovado = 1
+			where t.ano = ?
+			group by t.id
+		) atividadesaprovadas
+		inner join
+		(
+			select t.id idturma, count(*) qtde
+			from turma t
+			inner join turma_usuario tu on tu.idturma = t.id and tu.idusuario = ? and tu.professor = 0
+			inner join atividade a on a.idlivro = t.idlivro
+			where t.ano = ?
+			group by t.id
+		) atividadesporturma on atividadesporturma.idturma = atividadesaprovadas.idturma
+		inner join
+		(
+			select t.id idturma, count(tal.id) qtde
+			from turma t
+			inner join turma_usuario tu on tu.idturma = t.id and tu.idusuario = ? and tu.professor = 0
+			left join turma_atividade_liberada tal on tal.idturma = tu.idturma
+			where t.ano = ?
+			group by t.id
+		) atividadesliberadasporturma on atividadesliberadasporturma.idturma = atividadesaprovadas.idturma
+		inner join turma t on t.id = atividadesaprovadas.idturma
+		inner join livro on t.idlivro = livro.id
 `, [idaluno, ano, idaluno, ano, idaluno, ano]) || [];
 
 			for (let i = situacao.length - 1; i >= 0; i--) {
