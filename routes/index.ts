@@ -23,7 +23,7 @@ class IndexRoute {
 				titulo: " ",
 				usuario: u,
 				lista: await Turma.situacaoPorAluno(2022, u.id),
-				atividades: await Turma.notasAluno(u.id)
+				atividades: await Turma.notasAluno(u.id, 2022)
 			});
 		}
 	}
@@ -51,7 +51,7 @@ class IndexRoute {
 				titulo: "Notas",
 				datatables: true,
 				usuario: u,
-				notas: await Turma.notasAluno(u.id),
+				notas: await Turma.notasAluno(u.id, 2022),
 				situacao: await Turma.situacaoPorAluno(2022, u.id)
 			});
 		}else{

@@ -459,7 +459,7 @@ inner join turma t on t.id = atividadesaprovadas.idturma
 		});
 	}
 
-	public static async notasAluno(idaluno: number): Promise<SituacaoAtividadesAluno[]>{
+	public static async notasAluno(idaluno: number, ano: number): Promise<SituacaoAtividadesAluno[]>{
 		return app.sql.connect(async (sql) => {
 			const situacao:SituacaoAtividadesAluno[] = await sql.query(`select turma.nome turma, atividade.nome atividade, atividade.capitulo, atividade.idsecao, turma_usuario_atividade.aprovado, turma_usuario_atividade.conclusao
 			from
@@ -473,7 +473,7 @@ inner join turma t on t.id = atividadesaprovadas.idturma
 			inner join
 			turma on turma_usuario.idturma = turma.id
 			where
-			turma_usuario.idusuario = ?`,[idaluno]);
+			turma_usuario.idusuario = ? and turma.ano = ?`,[idaluno, ano]);
 			return situacao;
 		})
 	}

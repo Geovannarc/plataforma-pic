@@ -25,8 +25,7 @@
 
     <% for(let i = 0; i<lista.qtdeliberadas; i++){ %>
 
-        liberadas.push("<%-atividades[i].capitulo%>");
-        
+        liberadas.push(<%-atividades[i].capitulo%>);   
 
     <%}%>
 
@@ -35,9 +34,9 @@
     }
 
     <%if(lista.idlivro == 2){%> //melhorar isso
-        let total = ['1', '2', '3', '4', '5']
+        let total = Array.from({length: 5}, (_, i) => i + 1)
     <%} else if(lista.idlivro == 1){%>
-        let total = ['1', '2', '3', '4', '5', '6'] 
+        let total = Array.from({length: 6}, (_, i) => i + 1)
     <%}%>
 
 
@@ -46,7 +45,7 @@
             document.getElementById(`img-${i}`).style.opacity = "0.4";
         }
         if(liberadas.indexOf(total[total.length - 1]) == -1){
-            document.getElementById(`img-6`).style.opacity = "0.4";
+            document.getElementById(`img-${total.length + 1}`).style.opacity = "0.4";
         }
     }
 
