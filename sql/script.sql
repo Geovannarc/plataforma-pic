@@ -42,10 +42,37 @@ CREATE TABLE secao (
 INSERT INTO secao (id, nome) VALUES (1, 'EXPLORANDO IDEIAS'), (2, 'APRENDENDO'), (3, 'ATIVIDADES'), (4, 'CONECTANDO'), (5, 'VAMOS JOGAR');
 
 CREATE TABLE livro (
-  id int NOT NULL AUTO_INCREMENT,
+  id int NOT NULL,
   nome varchar(100) NOT NULL,
+  capitulos int NOT NULL,
   PRIMARY KEY (id)
 );
+
+INSERT INTO livro (id, nome, capitulos) VALUES
+(1, 'Vamos Jogar Xadrez', 5),
+(2, 'Descobrindo o Jogo de Xadrez', 6);
+
+CREATE TABLE capitulo (
+  idlivro int NOT NULL,
+  capitulo int NOT NULL,
+  atividades int NOT NULL,
+  PRIMARY KEY (idlivro, capitulo),
+  KEY capitulo_capitulo_IX (capitulo, idlivro),
+  CONSTRAINT capitulo_idlivro_FK FOREIGN KEY (idlivro) REFERENCES livro (id) ON DELETE RESTRICT ON UPDATE RESTRICT
+);
+
+INSERT INTO capitulo (idlivro, capitulo, atividades) VALUES
+(1, 1, 5),
+(1, 2, 10),
+(1, 3, 10),
+(1, 4, 10),
+(1, 5, 10),
+(2, 1, 5),
+(2, 2, 10),
+(2, 3, 10),
+(2, 4, 10),
+(2, 5, 10),
+(2, 6, 10);
 
 CREATE TABLE atividade (
   id int NOT NULL AUTO_INCREMENT,
