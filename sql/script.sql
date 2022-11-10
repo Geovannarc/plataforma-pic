@@ -45,12 +45,13 @@ CREATE TABLE livro (
   id int NOT NULL,
   nome varchar(100) NOT NULL,
   capitulos int NOT NULL,
+  atividades int NOT NULL,
   PRIMARY KEY (id)
 );
 
-INSERT INTO livro (id, nome, capitulos) VALUES
-(1, 'Vamos Jogar Xadrez', 5),
-(2, 'Descobrindo o Jogo de Xadrez', 6);
+INSERT INTO livro (id, nome, capitulos, atividades) VALUES
+(1, 'Vamos Jogar Xadrez', 5, 0),
+(2, 'Descobrindo o Jogo de Xadrez', 6, 0);
 
 CREATE TABLE capitulo (
   idlivro int NOT NULL,
@@ -73,6 +74,8 @@ INSERT INTO capitulo (idlivro, capitulo, atividades) VALUES
 (2, 4, 10),
 (2, 5, 10),
 (2, 6, 10);
+
+UPDATE livro l SET l.atividades = (SELECT SUM(atividades) FROM capitulo c WHERE c.idlivro = l.id) WHERE l.id > 0;
 
 CREATE TABLE atividade (
   id int NOT NULL AUTO_INCREMENT,
@@ -139,7 +142,7 @@ CREATE TABLE turma_usuario_atividade (
   aprovado tinyint NOT NULL,
   conclusao datetime NOT NULL,
   PRIMARY KEY (id),
-  KEY turma_usuario_atividade_idturma_usuario_idatividade_IX (idturma_usuario, idatividade),
+  KEY turma_usuario_atividade_idturma_usuario_idatividade_aprovado_IX (idturma_usuario, idatividade, aprovado),
   KEY turma_usuario_atividade_idatividade_IX (idatividade),
   CONSTRAINT turma_usuario_atividade_idturma_usuario_FK FOREIGN KEY (idturma_usuario) REFERENCES turma_usuario (id) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT turma_usuario_atividade_idatividade_FK FOREIGN KEY (idatividade) REFERENCES atividade (id) ON DELETE CASCADE ON UPDATE RESTRICT
@@ -155,7 +158,3 @@ CREATE TABLE turma_atividade_liberada (
   CONSTRAINT turma_atividade_liberada_idturma_FK FOREIGN KEY (idturma) REFERENCES turma (id) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT turma_atividade_liberada_idatividade_FK FOREIGN KEY (idatividade) REFERENCES atividade (id) ON DELETE CASCADE ON UPDATE RESTRICT
 );
-
-INSERT INTO livro (id, nome) VALUES (1, 'Vamos Jogar Xadrez'), (2, 'Descobrindo O Jogo De Xadrez');
-
--- select conclusao from turma_atividade_usuario where idturma_atividade = xxx and idusuario = yyy

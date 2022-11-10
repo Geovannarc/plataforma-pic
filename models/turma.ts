@@ -409,8 +409,8 @@ class Turma {
 	public static async situacaoPorAluno(ano: number, idaluno: number): Promise<SituacaoAluno> {
 		return app.sql.connect(async (sql) => {
 			const situacao: SituacaoAluno[] = await sql.query(`
-			select t.nome, t.serie, t.sala, t.idlivro, livro.capitulos, livro.nome livro, atividadesaprovadas.idturma, atividadesaprovadas.aprovadas,
-			atividadesporturma.qtde qtdeatividades,
+		select t.nome, t.serie, t.sala, t.idlivro, livro.capitulos, livro.nome livro, atividadesaprovadas.idturma, atividadesaprovadas.aprovadas,
+			livro.atividades qtdeatividades,
 			atividadesliberadasporturma.qtde qtdeliberadas,
 			atividadesliberadasporturma.qtde - atividadesaprovadas.aprovadas faltantes
 		from
@@ -424,15 +424,6 @@ class Turma {
 		) atividadesaprovadas
 		inner join
 		(
-			select t.id idturma, count(*) qtde
-			from turma t
-			inner join turma_usuario tu on tu.idturma = t.id and tu.idusuario = ? and tu.professor = 0
-			inner join atividade a on a.idlivro = t.idlivro
-			where t.ano = ?
-			group by t.id
-		) atividadesporturma on atividadesporturma.idturma = atividadesaprovadas.idturma
-		inner join
-		(
 			select t.id idturma, count(tal.id) qtde
 			from turma t
 			inner join turma_usuario tu on tu.idturma = t.id and tu.idusuario = ? and tu.professor = 0
@@ -442,23 +433,45 @@ class Turma {
 		) atividadesliberadasporturma on atividadesliberadasporturma.idturma = atividadesaprovadas.idturma
 		inner join turma t on t.id = atividadesaprovadas.idturma
 		inner join livro on t.idlivro = livro.id
-`, [idaluno, ano, idaluno, ano, idaluno, ano]) || [];
+`, [idaluno, ano, idaluno, ano]) || [];
 
 			for (let i = situacao.length - 1; i >= 0; i--) {
-				if (situacao[i].qtdeatividades) {
-					situacao[i].percliberadas = Math.round(100 * situacao[i].qtdeliberadas / situacao[i].qtdeatividades);
-					situacao[i].percaprovadas = Math.round(100 * situacao[i].aprovadas / situacao[i].qtdeliberadas);
-					situacao[i].percfaltantes = 100 - situacao[i].percaprovadas;
-					situacao[i].percrealizadastotal = Math.round(100 * situacao[i].aprovadas / situacao[i].qtdeatividades);
-				} else {
-					situacao[i].percliberadas = 0;
-					situacao[i].percaprovadas = 0;
-					situacao[i].percfaltantes = 0;
-					situacao[i].percrealizadastotal = 0;
-				}
+				situacao[i].percliberadas = Math.round(100 * situacao[i].qtdeliberadas / situacao[i].qtdeatividades);
+				situacao[i].percaprovadas = Math.round(100 * situacao[i].aprovadas / situacao[i].qtdeliberadas);
+				situacao[i].percfaltantes = 100 - situacao[i].percaprovadas;
+				situacao[i].percrealizadastotal = Math.round(100 * situacao[i].aprovadas / situacao[i].qtdeatividades);
 			}
 
 			return situacao[0] || null;
+		});
+	}
+
+	public static async situacaoPorAlunoPorCapitulo(ano: number, idaluno: number): Promise<SituacaoAluno> {
+		return app.sql.connect(async (sql) => {
+			const turma_livros: any[] = await sql.query(`
+			select t.id, t.nome, t.serie, t.sala, t.idlivro, livro.capitulos, livro.nome livro, tu.id idturma_usuario
+			from turma t
+			inner join turma_usuario tu on tu.idturma = t.id and tu.idusuario = ? and tu.professor = 0 
+			inner join livro on t.idlivro = livro.id
+			where t.ano = ?
+`, [idaluno, ano]);
+
+			if (!turma_livros || !turma_livros.length)
+				return null;
+
+			const turma_livro = turma_livros[0];
+
+			turma_livro.detalhes = await sql.query(`
+			select c.capitulo, min(c.atividades) atividades, count(tu.id) aprovadas
+			from capitulo c
+			inner join atividade a on a.idlivro = c.idlivro and a.capitulo = c.capitulo
+			left join turma_usuario_atividade tu on tu.idturma_usuario = ? and tu.idatividade = a.id and tu.aprovado = 1
+			where c.idlivro = ?
+			group by c.capitulo
+			order by c.capitulo
+`, [turma_livro.idturma_usuario, turma_livro.idlivro]) || [];
+
+			return turma_livro;
 		});
 	}
 
