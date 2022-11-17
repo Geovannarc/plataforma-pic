@@ -7,42 +7,80 @@
     <div class="container-fluid mt-5 mb-5" style="padding: 0 2em 0 2em;">
         <div class="progress" style="background-color: #e3d4c5;">
             <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
-            aria-valuenow="<%- lista.percrealizadastotal %> " aria-valuemin="0" aria-valuemax="100" style="width:<%- lista.percrealizadastotal %>%">
-            <%= lista.percrealizadastotal %>%
+            aria-valuenow="<%- lista.percaprovadas %> " aria-valuemin="0" aria-valuemax="100" style="width:<%- lista.percaprovadas %>%">
+            <%= lista.percaprovadas %>%
             </div>
         </div>
     </div>
 
+    <%if(lista.capitulos == 6){%>
     <%- include("caminho") %>
-
+    <%}%>
+    <%if(lista.capitulos == 5){%>
+        <%- include("caminho-2") %>
+    <%}%>
 </div>
 
 <%- contentFor("scripts") %>
 <script type="text/javascript">
 	//<![CDATA[
 	"use strict";
+
     let liberadas = []
 
-    <% for(let i = 0; i<lista.qtdeliberadas; i++){ %>
+    function liberarCadeados(){
+        <% for(let i = 0; i<liberadas.length; i++){ %>
+            liberadas.push(<%-liberadas[i].capitulo%>);   
+        <%}%>
 
-        liberadas.push(<%-atividades[i].capitulo%>);   
-
-    <%}%>
-
-    for(let i of liberadas){
+        for(let i of liberadas){
         document.getElementById(`cadeado-fechado-${i}`).style.display = "none";
-    }
-
-    let total = Array.from({length: <%-lista.capitulos%>}, (_, i) => i + 1)
-
-
-    for(let i of total){
-        if(liberadas.indexOf(i) == -1){
-            document.getElementById(`img-${i}`).style.opacity = "0.4";
-        }
-        if(liberadas.indexOf(<%-lista.capitulos%>) == -1){
-            document.getElementById(`img-${total.length + 1}`).style.opacity = "0.4";
         }
     }
 
+    liberarCadeados();
+
+    let aprovadas = []
+    let totalAtividades = []
+
+    function estrelaEopacidade(){
+        <%for(let i = 0; i<lista.detalhes.length; i++){%>
+            aprovadas.push(<%-lista.detalhes[i].aprovadas%>)
+            totalAtividades.push(<%-lista.detalhes[i].atividades%>)
+        <%}%>
+
+        let total = Array.from({length: <%-lista.capitulos%>}, (_, i) => i + 1)
+
+        for(let i of total){
+            if(liberadas.indexOf(i) == -1){
+                document.getElementById(`img-${i}`).style.opacity = "0.4";
+            }
+            if(liberadas.indexOf(<%-lista.capitulos%>) == -1){
+                document.getElementById(`img-${total.length + 1}`).style.opacity = "0.4";
+            }
+            if(aprovadas[i-1] < totalAtividades[i-1] || !aprovadas[i]){
+                document.getElementById(`estrela-${i}`).style.display = "none";
+            }else{
+                document.getElementById(`estrela-${i}`).style.display = "block";
+            }
+        }
+
+        if(aprovadas[total.length] < totalAtividades[total.length] || !aprovadas[total.length]){
+            document.getElementById(`estrela-${total.length + 1}`).style.display = "none";
+        }
+    }
+    estrelaEopacidade();
+
+    function adicionaLinks(){
+        for(let i of liberadas){
+            document.getElementById(`img-${i}`).setAttribute('onclick',`link(${i});`);
+            document.getElementById(`img-${i}`).style.cursor = "pointer";
+        }
+    }
+
+    adicionaLinks();
+
+    function link(id){
+        window.location.href = `<%staticRoot%>/atividade/${id}`
+    }
 </script>

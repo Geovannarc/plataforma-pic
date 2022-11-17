@@ -471,6 +471,13 @@ class Turma {
 			order by c.capitulo
 `, [turma_livro.idturma_usuario, turma_livro.idlivro]) || [];
 
+	let aprovadas = 0;
+	let total = 0;
+	for (let i = turma_livro.detalhes.length - 1; i >= 0; i--) {
+		aprovadas += turma_livro.detalhes[i].aprovadas;
+		total += turma_livro.detalhes[i].atividades
+	}
+	turma_livro.percaprovadas = Math.round((aprovadas/total)*100)
 			return turma_livro;
 		});
 	}
@@ -491,6 +498,19 @@ class Turma {
 			where
 			turma_usuario.idusuario = ? and turma.ano = ?`,[idaluno, ano]);
 			return situacao;
+		})
+	}
+
+	public static async liberadasPorTurma(idusuario: number, ano:2022){
+		return app.sql.connect(async (sql) => {
+			const situacao = await sql.query(`SELECT idatividade, atividade.nome, url, capitulo, idsecao
+			FROM usuario
+			INNER JOIN turma_usuario ON usuario.id = turma_usuario.idusuario
+			INNER JOIN turma_atividade_liberada ON turma_atividade_liberada.idturma = turma_usuario.idturma
+			INNER JOIN atividade ON atividade.id = turma_atividade_liberada.idatividade
+			INNER JOIN turma ON turma.id = turma_atividade_liberada.idturma
+			WHERE idusuario = ? AND turma.ano = ?`, [idusuario, ano])
+			return situacao
 		})
 	}
 };

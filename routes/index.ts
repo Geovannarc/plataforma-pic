@@ -22,8 +22,9 @@ class IndexRoute {
 				layout: "menu",
 				titulo: " ",
 				usuario: u,
-				lista: await Turma.situacaoPorAluno(2022, u.id),
-				atividades: await Turma.notasAluno(u.id, 2022)
+				lista: await Turma.situacaoPorAlunoPorCapitulo(2022, u.id),
+				atividades: await Turma.notasAluno(u.id, 2022),
+				liberadas: await Turma.liberadasPorTurma(u.id, 2022)
 			});
 		}
 	}
