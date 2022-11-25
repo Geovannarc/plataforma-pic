@@ -81,6 +81,6 @@
     adicionaLinks();
 
     function link(id){
-        window.location.href = `<%staticRoot%>/atividade/${id}`
+        window.location.href = `<%staticRoot%>/capitulo/atividade?id=${id}&l=${<%=lista.idlivro%>}`
     }
 </script>

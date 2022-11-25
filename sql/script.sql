@@ -57,6 +57,7 @@ CREATE TABLE capitulo (
   idlivro int NOT NULL,
   capitulo int NOT NULL,
   atividades int NOT NULL,
+  nome varchar(30) NOT NULL,
   PRIMARY KEY (idlivro, capitulo),
   KEY capitulo_capitulo_IX (capitulo, idlivro),
   CONSTRAINT capitulo_idlivro_FK FOREIGN KEY (idlivro) REFERENCES livro (id) ON DELETE RESTRICT ON UPDATE RESTRICT

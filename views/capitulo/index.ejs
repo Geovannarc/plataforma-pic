@@ -1,0 +1,35 @@
+<script type="text/javascript">
+    const atividade = parseInt("<%= atividade %>");
+    const livro = parseInt("<%= livro %>");
+
+    function enviarResposta() {
+
+    }
+</script>
+
+<%let i;
+for(let item of liberadas){
+    if(item.idatividade == atividade){
+        i = liberadas.indexOf(item)
+    }
+}%>
+<div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-9">
+                <h2 class="text-center"><%=liberadas[i].nomecapitulo%></h2>
+                <div class="atividade">
+                    <%- include("livro" + livro + "/atividade" + atividade)%>
+                </div>
+                <div class="bar">
+                    
+                </div>
+            </div>
+            <div class="col-sm-3 lista-secoes">
+                <%for(let i = 0; i < secoes.length; i++){%>
+                    <div class="secao">
+                        <h1><%=secoes[i].nome%></h1>
+                    </div>
+                <%}%>
+            </div>
+        </div>
+</div>

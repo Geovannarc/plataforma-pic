@@ -18,13 +18,14 @@ class IndexRoute {
 				lista: await Turma.situacaoPorProfessor(2022, u.id)
 			});
 		}else{
+			const ano = (new Date()).getFullYear();
 			res.render("index/menu", {
 				layout: "menu",
 				titulo: " ",
 				usuario: u,
-				lista: await Turma.situacaoPorAlunoPorCapitulo(2022, u.id),
-				atividades: await Turma.notasAluno(u.id, 2022),
-				liberadas: await Turma.liberadasPorTurma(u.id, 2022)
+				lista: await Turma.situacaoPorAlunoPorCapitulo(ano, u.id),
+				atividades: await Turma.notasAluno(ano, u.id),
+				liberadas: await Turma.liberadasPorTurma(ano, u.id)
 			});
 		}
 	}
@@ -47,13 +48,14 @@ class IndexRoute {
 			res.redirect(app.root + "/acesso");
 		else{
 			if(u.idperfil == Perfil.Aluno){
+				const ano = (new Date()).getFullYear();
 			res.render("index/notas", {
 				layout: "layout-sem-form",
 				titulo: "Notas",
 				datatables: true,
 				usuario: u,
-				notas: await Turma.notasAluno(u.id, 2022),
-				situacao: await Turma.situacaoPorAluno(2022, u.id)
+				notas: await Turma.notasAluno(ano, u.id),
+				situacao: await Turma.situacaoPorAluno(ano, u.id)
 			});
 		}else{
 			res.redirect(app.root + "/acesso");

@@ -446,6 +446,27 @@ class Turma {
 		});
 	}
 
+	public static async turmaDoAluno(ano: number, idaluno: number): Promise<number> {
+		return app.sql.connect(async (sql) => {
+			return await sql.scalar(`
+			select t.id from turma t
+			inner join turma_usuario tu on tu.idturma = t.id and tu.idusuario = ? and tu.professor = 0 
+			where t.ano = ?
+`, [idaluno, ano]) || 0;
+		});
+	}
+
+	public static async livroDoAluno(ano: number, idaluno: number): Promise<number> {
+		return app.sql.connect(async (sql) => {
+			return await sql.scalar(`
+			select t.idlivro
+			from turma t
+			inner join turma_usuario tu on tu.idturma = t.id and tu.idusuario = ? and tu.professor = 0 
+			where t.ano = ?
+`, [idaluno, ano]) || 0;
+		});
+	}
+
 	public static async situacaoPorAlunoPorCapitulo(ano: number, idaluno: number): Promise<SituacaoAluno> {
 		return app.sql.connect(async (sql) => {
 			const turma_livros: any[] = await sql.query(`
@@ -482,7 +503,7 @@ class Turma {
 		});
 	}
 
-	public static async notasAluno(idaluno: number, ano: number): Promise<SituacaoAtividadesAluno[]>{
+	public static async notasAluno(ano: number, idaluno: number): Promise<SituacaoAtividadesAluno[]>{
 		return app.sql.connect(async (sql) => {
 			const situacao:SituacaoAtividadesAluno[] = await sql.query(`select turma.nome turma, atividade.nome atividade, atividade.capitulo, atividade.idsecao, turma_usuario_atividade.aprovado, turma_usuario_atividade.conclusao
 			from
@@ -501,18 +522,37 @@ class Turma {
 		})
 	}
 
-	public static async liberadasPorTurma(idusuario: number, ano:2022){
+	public static async liberadasPorTurma(ano: number, idusuario: number): Promise<any[]>{
 		return app.sql.connect(async (sql) => {
-			const situacao = await sql.query(`SELECT idatividade, atividade.nome, url, capitulo, idsecao
+			const situacao = await sql.query(`SELECT idatividade, atividade.nome, url, atividade.capitulo, capitulo.nome nomecapitulo, idsecao
 			FROM usuario
 			INNER JOIN turma_usuario ON usuario.id = turma_usuario.idusuario
 			INNER JOIN turma_atividade_liberada ON turma_atividade_liberada.idturma = turma_usuario.idturma
 			INNER JOIN atividade ON atividade.id = turma_atividade_liberada.idatividade
-			INNER JOIN turma ON turma.id = turma_atividade_liberada.idturma
+            INNER JOIN turma ON turma.id = turma_atividade_liberada.idturma
+			INNER JOIN livro ON livro.id = turma.idlivro
+            INNER JOIN capitulo ON capitulo.capitulo = atividade.capitulo AND capitulo.idlivro = livro.id
 			WHERE idusuario = ? AND turma.ano = ?`, [idusuario, ano])
 			return situacao
 		})
 	}
+
+	public static async atividadesDoAlunoCasoEstejaLiberada(ano: number, idusuario: number, atividade: number, livro: number): Promise<{ situacao: SituacaoAluno, liberadas: any[] } | null> {
+		const situacao = await Turma.situacaoPorAlunoPorCapitulo(ano, idusuario);
+
+		if(situacao && livro == situacao.idlivro){
+			const liberadas = await Turma.liberadasPorTurma(ano, idusuario);
+            for(let i of liberadas){
+                if(i.idatividade == atividade){
+                    return {
+						situacao,
+						liberadas
+					};
+                }
+            }
+        }
+        return null;
+    }
 };
 
 export = Turma;

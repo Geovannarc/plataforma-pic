@@ -81,7 +81,7 @@ class TurmaApiRoute {
 		if (!u)
 			return;
 
-		res.json(await Turma.notasAluno(u.id, 2022));
+		res.json(await Turma.notasAluno((new Date()).getFullYear(), u.id));
 	}
 }
 
