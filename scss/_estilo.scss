@@ -9,3 +9,16 @@
     min-height: 100vh;
     background-attachment: fixed;
 }
+
+$cores-secoes: ("secao1" #628ead #628ead44, "secao2" #e47854 #e4785444, "secao3" #a3ba70 #a3ba7044, "secao4" #5888a9 #5888a944, "secao5" #e4bf4a #e4bf4a44);
+
+@each $nome, $cor, $transparencia in $cores-secoes {
+    .#{$nome}{
+        background-color: $cor;
+        box-shadow: 0.75em 0.75em 0 $transparencia;
+    }
+    .#{$nome}:hover {
+        transform: translate(0.75em, 0.75em);
+        box-shadow: 0 0 0 $transparencia;
+    }
+}

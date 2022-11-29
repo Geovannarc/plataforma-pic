@@ -6,6 +6,15 @@
 
     }
 </script>
+<%
+	let cores = [
+		"secao1",
+		"secao2",
+		"secao3",
+		"secao4",
+		"secao5"
+	];
+%>
 
 <%let i;
 for(let item of liberadas){
@@ -13,10 +22,10 @@ for(let item of liberadas){
         i = liberadas.indexOf(item)
     }
 }%>
-<div class="container-fluid">
+<div class="container-fluid c">
+    <h2 class="text-center"><%=liberadas[i].nomecapitulo%></h2>
         <div class="row">
             <div class="col-sm-9">
-                <h2 class="text-center"><%=liberadas[i].nomecapitulo%></h2>
                 <div class="atividade">
                     <%- include("livro" + livro + "/atividade" + atividade)%>
                 </div>
@@ -26,10 +35,36 @@ for(let item of liberadas){
             </div>
             <div class="col-sm-3 lista-secoes">
                 <%for(let i = 0; i < secoes.length; i++){%>
-                    <div class="secao">
-                        <h1><%=secoes[i].nome%></h1>
-                    </div>
+                    <a class="secao <%-cores[i]%>" href='<%staticRoot%>/capitulo/atividade/<%=i+1%>/<%=lista.idlivro%>'><%=secoes[i].nome%></a>
                 <%}%>
             </div>
         </div>
 </div>
+
+<%- contentFor("styles") %>
+<style>
+    .secao{
+        font-size: 1.7em;
+        padding: 0.75em !important;
+        display: block;
+        color: white;
+        width: 100%;
+        padding: 1em;
+        border-radius: 0.75em;
+        margin-bottom: 2em;
+        transform: translate(0px, 0px);
+        transition: box-shadow ease-in-out 0.3s, transform ease-in-out 0.3s;
+    }
+
+    a:hover{
+        color: white;
+    }
+
+    .color-white{
+        color: white;
+    }
+
+    .c{
+        background-color: rgba(241, 241, 241, 0.711);
+    }
+</style>
