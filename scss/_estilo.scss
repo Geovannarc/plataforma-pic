@@ -10,15 +10,17 @@
     background-attachment: fixed;
 }
 
-$cores-secoes: ("secao1" #628ead #628ead44, "secao2" #e47854 #e4785444, "secao3" #a3ba70 #a3ba7044, "secao4" #5888a9 #5888a944, "secao5" #e4bf4a #e4bf4a44);
+$cores-secoes: ("secao1" #628ead #fff #628ead44, "secao2" #e47854 #fff #e4785444, "secao3" #a3ba70 #000 #a3ba7044, "secao4" #5888a9 #fff #5888a944, "secao5" #e4bf4a #000 #e4bf4a44);
 
-@each $nome, $cor, $transparencia in $cores-secoes {
+@each $nome, $cor, $cor-fonte, $transparencia in $cores-secoes {
     .#{$nome}{
         background-color: $cor;
+        color: $cor-fonte;
         box-shadow: 0.75em 0.75em 0 $transparencia;
     }
     .#{$nome}:hover {
         transform: translate(0.75em, 0.75em);
+        color: $cor-fonte;
         box-shadow: 0 0 0 $transparencia;
     }
 }

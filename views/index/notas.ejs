@@ -160,7 +160,7 @@ let cores = [
 					{ title: "Atividade", render: encode, data: "atividade" },
 					{ title: "Capítulo", data: "capitulo" },
 					{ title: "Seção", data: "idsecao" },
-					{ title: "Aprovado", data: "aprovado" },
+					{ title: "Aprovado", render: encode, data: function (row) { return row.aprovado ? "Sim" : "Não"; }},
 					{ title: "Conclusão", "class": "col-min text-right", "type": "customdateint", data: "conclusao" }
 				],
 				data: notas,

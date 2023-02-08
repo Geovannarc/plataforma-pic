@@ -147,11 +147,11 @@ let turmas = [];
 let liberadas = [];
 let aprovadas = [];
 
-	//<%for(let j = 0; j < lista.qtdeturmas; j++){%>
-	turmas.push("<%=lista.situacao[j].nome%>")
-	liberadas.push("<%=lista.situacao[j].percliberadas%>")
-	aprovadas.push("<%=lista.situacao[j].percaprovadas%>")
-	//<%}%>
+	<%for(let j = 0; j < lista.qtdeturmas; j++){%>
+	turmas.push("<%-lista.situacao[j].nome%>")
+	liberadas.push("<%-lista.situacao[j].percliberadas%>")
+	aprovadas.push("<%-lista.situacao[j].percaprovadas%>")
+	<%}%>
 
 var myBarChart = new Chart(ctx, {
 	type: 'bar',
