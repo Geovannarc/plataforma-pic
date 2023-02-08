@@ -63,18 +63,18 @@ CREATE TABLE capitulo (
   CONSTRAINT capitulo_idlivro_FK FOREIGN KEY (idlivro) REFERENCES livro (id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
-INSERT INTO capitulo (idlivro, capitulo, atividades) VALUES
-(1, 1, 5),
-(1, 2, 10),
-(1, 3, 10),
-(1, 4, 10),
-(1, 5, 10),
-(2, 1, 5),
-(2, 2, 10),
-(2, 3, 10),
-(2, 4, 10),
-(2, 5, 10),
-(2, 6, 10);
+INSERT INTO capitulo (idlivro, capitulo, atividades, nome) VALUES
+(1, 1, 5, 'O Jogo de Xadrez'),
+(1, 2, 10, 'As Peças I'),
+(1, 3, 10, 'As Peças II'),
+(1, 4, 10, 'Capítulo 1-4'),
+(1, 5, 10, 'Capítulo 1-5'),
+(2, 1, 5, 'Capítulo 2-1'),
+(2, 2, 10, 'Capítulo 2-2'),
+(2, 3, 10, 'Capítulo 2-3'),
+(2, 4, 10, 'Capítulo 2-4'),
+(2, 5, 10, 'Capítulo 2-5'),
+(2, 6, 10, 'Capítulo 2-6');
 
 UPDATE livro l SET l.atividades = (SELECT SUM(atividades) FROM capitulo c WHERE c.idlivro = l.id) WHERE l.id > 0;
 
