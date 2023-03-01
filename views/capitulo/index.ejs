@@ -2,9 +2,157 @@
     const atividade = parseInt("<%= atividade %>");
     const livro = parseInt("<%= livro %>");
 
-    function enviarResposta() {
+    setTimeout(function () {
+		let canvas = document.createElement("canvas"),
+			context = canvas.getContext("2d", { alpha: true }),
+			imgFolhas = [
+				document.createElement("img"),
+				document.createElement("img"),
+				document.createElement("img"),
+				document.createElement("img")
+			],
+			imgFolhasRestantes = imgFolhas.length,
+			offsetY = 80,
+			amplitudeMinima = 10,
+			amplitudeMaxima = 300,
+			velocidadeMinima = 10,
+			velocidadeMaxima = 40,
+			velocidadeFaseMinima = 0.05,
+			velocidadeFaseMaxima = 0.2,
+			qtdeFolhas = 100,
+			folhas = new Array(qtdeFolhas),
+			larguraTela = 0,
+			alturaTela = 0,
+			larguraCanvas = 0,
+			alturaCanvas = 0,
+			escalaFolhas = 1,
+			horaAnterior = 0,
+			iOSOuSafari = (function () {
+				// https://stackoverflow.com/q/9038625/3569421
+				if ((navigator.userAgent.indexOf("Chrome") <= 0 && navigator.userAgent.indexOf("Safari") >= 0) ||
+					(navigator.userAgent.indexOf("Mac") >= 0 && ("ontouchend" in document)))
+					return true;
+				switch (navigator.platform) {
+					case "iPad Simulator":
+					case "iPhone Simulator":
+					case "iPod Simulator":
+					case "iPad":
+					case "iPhone":
+					case "iPod":
+						return true;
+				}
+				return false;
+			})();
 
-    }
+		canvas.setAttribute("id", "canvas");
+		document.body.appendChild(canvas);
+
+		function criarFolha(i, apenasNoTopo) {
+			const folha = {
+				i: i,
+				tipo: (Math.random() * imgFolhas.length) | 0,
+				x: Math.random() * larguraCanvas,
+				y: (apenasNoTopo ? 0 : (Math.random() * (alturaCanvas + (offsetY * escalaFolhas)))) - (offsetY * escalaFolhas),
+				fase: Math.random(),
+				amplitude: amplitudeMinima + (Math.random() * (amplitudeMaxima - amplitudeMinima)),
+				v: velocidadeMinima + (Math.random() * (velocidadeMaxima - velocidadeMinima)),
+				vFase: velocidadeFaseMinima + (Math.random() * (velocidadeFaseMaxima - velocidadeFaseMinima)),
+			};
+
+			folhas[i] = folha;
+		}
+
+		function renderQuadro(horaAtual) {
+			requestAnimationFrame(renderQuadro);
+			context.resetTransform();
+			context.clearRect(0, 0, larguraCanvas, alturaCanvas);
+
+			const delta = Math.min(horaAtual - horaAnterior, 0.025);
+			horaAnterior = horaAtual;
+
+			for (let i = 0; i < qtdeFolhas; i++) {
+				const folha = folhas[i];
+
+				folha.y += folha.v * delta;
+				folha.fase += folha.vFase * delta;
+				while (folha.fase >= 2)
+					folha.fase -= 2;
+				const fase = (folha.fase > 1 ? (2 - folha.fase) : folha.fase);
+
+				if (folha.y >= (alturaCanvas + (offsetY * escalaFolhas))) {
+					criarFolha(folha.i, true);
+				} else {
+					context.resetTransform();
+					context.translate(
+						folha.x + (folha.amplitude * (fase - 0.5)),
+						folha.y - (folha.amplitude * 0.2 * Math.abs(fase - 0.5)),
+					);
+					// Fase 0 = 45 graus (PI / 4)
+					// Fase 1 = -45 graus (-PI / 4)
+					context.rotate((0.25 - (fase * 0.5)) * Math.PI);
+					context.scale(escalaFolhas, escalaFolhas);
+					context.drawImage(imgFolhas[folha.tipo], 0, 0);
+				}
+			}
+		}
+
+		function ajustarCanvas() {
+			larguraTela = window.innerWidth;
+			alturaTela = window.innerHeight;
+
+			if (document.documentElement && ("clientWidth" in document.documentElement)) {
+				larguraTela = document.documentElement.clientWidth;
+				alturaTela = document.documentElement.clientHeight;
+			}
+
+			if (iOSOuSafari) {
+				let bodyRect = null;
+
+				if (document.documentElement && ("getBoundingClientRect" in document.documentElement))
+					bodyRect = document.documentElement.getBoundingClientRect();
+				else if (("getBoundingClientRect" in document.body))
+					bodyRect = document.body.getBoundingClientRect();
+
+				if (bodyRect) {
+					larguraTela = bodyRect.right - bodyRect.left;
+					alturaTela = bodyRect.bottom - bodyRect.top;
+				}
+			}
+
+			escalaFolhas = ((window.devicePixelRatio > 0) ? window.devicePixelRatio : 1);
+			canvas.width = larguraCanvas = (larguraTela * escalaFolhas);
+			canvas.height = alturaCanvas = (alturaTela * escalaFolhas);
+			canvas.style.width = larguraTela + "px";
+			canvas.style.height = alturaTela + "px";
+		}
+
+		window.addEventListener("resize", ajustarCanvas);
+
+		ajustarCanvas();
+
+		function imgFolhaTerminada() {
+			imgFolhasRestantes--;
+			if (imgFolhasRestantes > 0 || !imgFolhas.length)
+				return;
+
+			for (let i = 0; i < qtdeFolhas; i++)
+				criarFolha(i, false);
+
+			requestAnimationFrame(renderQuadro);
+		}
+
+		function carregarImgFolha(i) {
+			imgFolhas[i].onload = imgFolhaTerminada;
+			imgFolhas[i].onerror = function () {
+				imgFolhas.splice(i, 1);
+				imgFolhaTerminada();
+			};
+			imgFolhas[i].src = `<%- staticRoot %>/img/folha${(i + 1)}.png`;
+		}
+
+		for (let i = 0; i < imgFolhas.length; i++)
+			carregarImgFolha(i);
+	}, 10);
 </script>
 <%
 	let cores = [
@@ -47,6 +195,52 @@ for(let item of liberadas){
 <%- contentFor("styles") %>
 <style>
 
+html {
+		height: 100%;
+		min-height: 100%;
+		max-height: 100%;
+		-webkit-tap-highlight-color: rgba(0,0,0,0);
+	}
+
+	html {
+		background: url('<%- staticRoot %>/img/sistemax.jpg'); /* Safari iOS e Opera Android em fullscreen */
+		background-position: center;
+		background-size: cover;
+	}
+
+	html, body, button, input, textarea, select, p, div {
+		font-family: sans-serif;
+		font-style: normal;
+		font-weight: 400;
+		line-height: 1;
+	}
+
+	body {
+		padding: 0;
+		margin: 0;
+		background: none;
+		color: #fff;
+		width: 100%;
+		height: 100%;
+		min-height: 100%;
+		max-height: 100%;
+		overflow: hidden;
+	}
+
+	#canvas {
+		position: absolute;
+		z-index: 1;
+		overflow: hidden;
+		left: 0;
+		top: 0;
+		width: 0;
+		height: 0;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		pointer-events: none;
+	}
+
     .textura{
         background-image: url('/public/img/textura.png');
     }
@@ -65,7 +259,7 @@ for(let item of liberadas){
         display: block;
         width: 100%;
         border-radius: 0.75em;
-        margin-bottom: 2.5em;
+        margin-bottom: 1.8em;
         transform: translate(0px, 0px);
         transition: box-shadow ease-in-out 0.3s, transform ease-in-out 0.3s;
     }
@@ -80,6 +274,8 @@ for(let item of liberadas){
 
     .c{
         background-color: rgba(241, 241, 241, 0.711);
+        z-index: 10000;
+        position: relative;
     }
 
     .titulo{
@@ -90,6 +286,7 @@ for(let item of liberadas){
         padding: 30px;
         display: inline-block; 
         width: 90%;
+        color: #414141;
     }
 
 </style>
