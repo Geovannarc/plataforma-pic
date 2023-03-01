@@ -17,7 +17,7 @@
     <%- include("caminho") %>
     <%}%>
     <%if(lista.capitulos == 5){%>
-        <%- include("caminho-2") %>
+    <%- include("caminho-2") %>
     <%}%>
 </div>
 
@@ -26,61 +26,49 @@
 	//<![CDATA[
 	"use strict";
 
-    let liberadas = []
+    let liberadas = <%- JSON.stringify(liberadas) %>;
+    let capitulosComAtividadesLiberadas = new Set();
 
-    function liberarCadeados(){
-        <% for(let i = 0; i<liberadas.length; i++){ %>
-            liberadas.push(<%-liberadas[i].capitulo%>); 
-        <%}%>
-
-        for(let i of liberadas){
-        document.getElementById(`cadeado-fechado-${i}`).style.display = "none";
+    function liberarCadeados() {
+        for (let liberada of liberadas) {
+            document.getElementById(`cadeado-fechado-${liberada.capitulo}`).style.display = "none";
+            capitulosComAtividadesLiberadas.add(liberada.capitulo);
         }
     }
 
     liberarCadeados();
 
-    let aprovadas = []
-    let totalAtividades = []
+    let situacao = <%- JSON.stringify(lista) %>;
 
     function estrelaEopacidade(){
-        <%for(let i = 0; i<lista.detalhes.length; i++){%>
-            aprovadas.push(<%-lista.detalhes[i].aprovadas%>)
-            totalAtividades.push(<%-lista.detalhes[i].atividades%>)
-        <%}%>
+        for (let i = 0; i < situacao.capitulos; i++) {
+            const capitulo = i + 1;
 
-        let total = Array.from({length: <%-lista.capitulos%>}, (_, i) => i + 1)
+            if (!capitulosComAtividadesLiberadas.has(capitulo)) {
+                document.getElementById(`img-${capitulo}`).style.opacity = "0.25";
+            } else {
+                document.getElementById(`img-${capitulo}`).style.cursor = "pointer";
+                document.getElementById(`img-${capitulo}`).setAttribute('onclick',`link(${capitulo});`);
+            }
 
-        for(let i of total){
-            if(liberadas.indexOf(i) == -1){
-                document.getElementById(`img-${i}`).style.opacity = "0.4";
-            }
-            if(liberadas.indexOf(<%-lista.capitulos%>) == -1){
-                document.getElementById(`img-${total.length + 1}`).style.opacity = "0.4";
-            }
-            if(aprovadas[i-1] < totalAtividades[i-1] || !aprovadas[i]){
-                document.getElementById(`estrela-${i}`).style.display = "none";
-            }else{
-                document.getElementById(`estrela-${i}`).style.display = "block";
+            if (i < situacao.detalhes.length) {
+                // Verifica a aprovação para mostrar ou ocultar a estrela
+                if (situacao.detalhes[i].aprovadas < situacao.detalhes[i].atividades) {
+                    document.getElementById(`estrela-${capitulo}`).style.display = "none";
+                }
+            } else {
+                // i é um capítulo que não foi nem feito/liberado ainda
+                document.getElementById(`estrela-${capitulo}`).style.display = "none";
             }
         }
-
-        if(aprovadas[total.length] < totalAtividades[total.length] || !aprovadas[total.length]){
-            document.getElementById(`estrela-${total.length + 1}`).style.display = "none";
+        
+        if (situacao.capitulos < 6) {
+            // @@@ ocultar o último trecho
         }
     }
     estrelaEopacidade();
 
-    function adicionaLinks(){
-        for(let i of liberadas){
-            document.getElementById(`img-${i}`).setAttribute('onclick',`link(${i});`);
-            document.getElementById(`img-${i}`).style.cursor = "pointer";
-        }
-    }
-
-    adicionaLinks();
-
     function link(id){
-        window.location.href = `<%staticRoot%>/capitulo/atividade/${id}/${<%=lista.idlivro%>}`
+        window.location.href = `<%-root%>/capitulo/atividade/${id}/<%-lista.idlivro%>`;
     }
 </script>

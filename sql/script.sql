@@ -39,7 +39,7 @@ CREATE TABLE secao (
 );
 
 -- Manter sincronizado com enums/secao.ts e models/secao.ts
-INSERT INTO secao (id, nome) VALUES (1, 'EXPLORANDO IDEIAS'), (2, 'APRENDENDO'), (3, 'ATIVIDADES'), (4, 'CONECTANDO'), (5, 'VAMOS JOGAR');
+INSERT INTO secao (id, nome) VALUES (1, 'EXPLORANDO IDEIAS'), (2, 'APRENDENDO'), (3, 'ATIVIDADE'), (4, 'CONECTANDO'), (5, 'VAMOS JOGAR');
 
 CREATE TABLE livro (
   id int NOT NULL,
@@ -64,33 +64,43 @@ CREATE TABLE capitulo (
 );
 
 INSERT INTO capitulo (idlivro, capitulo, atividades, nome) VALUES
-(1, 1, 5, 'O Jogo de Xadrez'),
-(1, 2, 10, 'As Peças I'),
-(1, 3, 10, 'As Peças II'),
-(1, 4, 10, 'Capítulo 1-4'),
-(1, 5, 10, 'Capítulo 1-5'),
-(2, 1, 5, 'Capítulo 2-1'),
-(2, 2, 10, 'Capítulo 2-2'),
-(2, 3, 10, 'Capítulo 2-3'),
-(2, 4, 10, 'Capítulo 2-4'),
-(2, 5, 10, 'Capítulo 2-5'),
-(2, 6, 10, 'Capítulo 2-6');
-
-UPDATE livro l SET l.atividades = (SELECT SUM(atividades) FROM capitulo c WHERE c.idlivro = l.id) WHERE l.id > 0;
+(1, 1, 0, 'O Jogo de Xadrez'),
+(1, 2, 0, 'As Peças I'),
+(1, 3, 0, 'As Peças II'),
+(1, 4, 0, 'Capítulo 1-4'),
+(1, 5, 0, 'Capítulo 1-5'),
+(2, 1, 0, 'Capítulo 2-1'),
+(2, 2, 0, 'Capítulo 2-2'),
+(2, 3, 0, 'Capítulo 2-3'),
+(2, 4, 0, 'Capítulo 2-4'),
+(2, 5, 0, 'Capítulo 2-5'),
+(2, 6, 0, 'Capítulo 2-6');
 
 CREATE TABLE atividade (
-  id int NOT NULL AUTO_INCREMENT,
+  id int NOT NULL,
   nome varchar(100) NOT NULL,
-  url varchar(100) NOT NULL,
+  sufixo varchar(10) NOT NULL,
   idlivro int NOT NULL,
   capitulo int NOT NULL,
   idsecao int NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE KEY atividade_idlivro_capitulo_idsecao_UN (idlivro, capitulo, idsecao),
+  KEY atividade_idlivro_capitulo_idsecao_IX (idlivro, capitulo, idsecao),
   KEY atividade_idsecao_IX (idsecao),
   CONSTRAINT atividade_idlivro_FK FOREIGN KEY (idlivro) REFERENCES livro (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT atividade_idsecao_FK FOREIGN KEY (idsecao) REFERENCES secao (id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
+
+INSERT INTO atividade (id, sufixo, idlivro, capitulo, idsecao) VALUES
+(1, '', 1, 1, 1), -- Explorando Ideias
+(2, '', 1, 1, 2), -- Aprendendo
+(3, ' - 1', 1, 1, 3), -- Atividade
+(4, ' - 2', 1, 1, 3), -- Atividade
+(5, '', 1, 1, 4), -- Conectando
+(6, '', 1, 1, 5); -- Vamos Jogar
+
+UPDATE atividade a SET a.nome = CONCAT((SELECT nome FROM secao s WHERE s.id = a.idsecao), a.sufixo) WHERE a.id > 0;
+UPDATE capitulo c SET c.atividades = (SELECT COUNT(id) FROM atividade a WHERE a.idlivro = c.idlivro AND a.capitulo = c.capitulo) WHERE c.idlivro > 0;
+UPDATE livro l SET l.atividades = (SELECT SUM(atividades) FROM capitulo c WHERE c.idlivro = l.id) WHERE l.id > 0;
 
 CREATE TABLE escola (
   id int NOT NULL AUTO_INCREMENT,
@@ -159,3 +169,15 @@ CREATE TABLE turma_atividade_liberada (
   CONSTRAINT turma_atividade_liberada_idturma_FK FOREIGN KEY (idturma) REFERENCES turma (id) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT turma_atividade_liberada_idatividade_FK FOREIGN KEY (idatividade) REFERENCES atividade (id) ON DELETE CASCADE ON UPDATE RESTRICT
 );
+
+-- Teste inicial
+
+INSERT INTO usuario (email, nome, idperfil, senha, token, criacao) VALUES ('professor1@portalsistemax.com.br', 'Professor 1', 2, 'NsSzgX9AXd2G85aiCOrUwAFkiEHrHYljYWpJBCfqOvKr:WD+jsEW/Dswcivs42EZBZREfm+4WaPcZHRPG5LJpD8yr', NULL, NOW());
+INSERT INTO usuario (email, nome, idperfil, senha, token, criacao) VALUES ('professor2@portalsistemax.com.br', 'Professor 2', 2, 'NsSzgX9AXd2G85aiCOrUwAFkiEHrHYljYWpJBCfqOvKr:WD+jsEW/Dswcivs42EZBZREfm+4WaPcZHRPG5LJpD8yr', NULL, NOW());
+INSERT INTO usuario (email, nome, idperfil, senha, token, criacao) VALUES ('aluno1@portalsistemax.com.br', 'Aluno 1', 3, 'NsSzgX9AXd2G85aiCOrUwAFkiEHrHYljYWpJBCfqOvKr:WD+jsEW/Dswcivs42EZBZREfm+4WaPcZHRPG5LJpD8yr', NULL, NOW());
+INSERT INTO usuario (email, nome, idperfil, senha, token, criacao) VALUES ('aluno2@portalsistemax.com.br', 'Aluno 2', 3, 'NsSzgX9AXd2G85aiCOrUwAFkiEHrHYljYWpJBCfqOvKr:WD+jsEW/Dswcivs42EZBZREfm+4WaPcZHRPG5LJpD8yr', NULL, NOW());
+INSERT INTO usuario (email, nome, idperfil, senha, token, criacao) VALUES ('aluno3@portalsistemax.com.br', 'Aluno 3', 3, 'NsSzgX9AXd2G85aiCOrUwAFkiEHrHYljYWpJBCfqOvKr:WD+jsEW/Dswcivs42EZBZREfm+4WaPcZHRPG5LJpD8yr', NULL, NOW());
+INSERT INTO usuario (email, nome, idperfil, senha, token, criacao) VALUES ('aluno4@portalsistemax.com.br', 'Aluno 4', 3, 'NsSzgX9AXd2G85aiCOrUwAFkiEHrHYljYWpJBCfqOvKr:WD+jsEW/Dswcivs42EZBZREfm+4WaPcZHRPG5LJpD8yr', NULL, NOW());
+INSERT INTO escola (nome, email, contato, criacao) VALUES ('Escola 1', 'email@escola1.com.br', 'Contato Escola 1', NOW());
+INSERT INTO turma (idescola, ano, serie, nome, sala, idlivro, criacao) VALUES (1, 2023, 1, 'Turma 1A', 'Sala A', 1, NOW());
+INSERT INTO turma (idescola, ano, serie, nome, sala, idlivro, criacao) VALUES (1, 2023, 1, 'Turma 1B', 'Sala B', 1, NOW());

@@ -6,7 +6,7 @@ import Turma = require("./turma");
 interface Atividade {
 	id: number;
 	nome: string;
-	url: string;
+	sufixo: string;
 	idlivro: number;
 	capitulo: number;
 	idsecao: number;
@@ -40,19 +40,19 @@ class Atividade {
 	public static listarDeatividade(id: number): Promise<Atividade[]> {
 		return app.sql.connect(async (sql) => {
 			// @@@
-			return (await sql.query("select id, nome, url, idsecao from atividade where id = ?", [id])) || [];
+			return (await sql.query("select id, nome, idsecao from atividade where id = ?", [id])) || [];
 		});
 	}
 
 	public static async listar(): Promise<any[]> {
 		return app.sql.connect(async (sql) => {
-			return (await sql.query("select a.id, a.nome, a.url, l.nome nomelivro, a.idsecao, s.nome nomesecao, a.capitulo from atividade a inner join livro l on l.id = a.idlivro inner join secao s on s.id = a.idsecao")) || [];
+			return (await sql.query("select a.id, a.nome, l.nome nomelivro, a.idsecao, s.nome nomesecao, a.capitulo from atividade a inner join livro l on l.id = a.idlivro inner join secao s on s.id = a.idsecao")) || [];
 		});
 	}
 
 	public static obter(id: number): Promise<Atividade> {
 		return app.sql.connect(async (sql) => {
-			const lista: Atividade[] = await sql.query("select id, nome, url, idlivro, capitulo, idsecao from atividade where id = ?", [id]);
+			const lista: Atividade[] = await sql.query("select id, nome, sufixo, idlivro, capitulo, idsecao from atividade where id = ?", [id]);
 
 			const atividade = (lista && lista[0]) || null;
 
@@ -69,11 +69,8 @@ class Atividade {
 		if (!criacao && isNaN(atividade.id))
 			return "Id inválido";
 
-		if (!atividade.nome || !(atividade.nome = atividade.nome.normalize().trim()) || atividade.nome.length > 100)
-			return "Nome inválido";
-
-		if (!atividade.url || !(atividade.url = atividade.url.normalize().trim()) || atividade.url.length > 100)
-			return "URL inválida";
+		if ((atividade.sufixo = (atividade.sufixo || "").normalize().trim()).length > 10)
+			return "Sufixo inválido";
 
 		if (isNaN(atividade.idlivro = parseInt(atividade.idlivro as any)))
 			return "Livro inválido";
@@ -94,14 +91,21 @@ class Atividade {
 
 		return app.sql.connect(async (sql) => {
 			try {
-				await sql.query("insert into atividade (nome, url, idlivro, capitulo, idsecao) values (?, ?, ?, ?, ?)", [atividade.nome, atividade.url, atividade.idlivro, atividade.capitulo, atividade.idsecao]);
+				await sql.beginTransaction();
+
+				await sql.query("insert into atividade (nome, sufixo, idlivro, capitulo, idsecao) values ('', ?, ?, ?, ?)", [atividade.sufixo, atividade.idlivro, atividade.capitulo, atividade.idsecao]);
+
+				atividade.id = await sql.scalar("select last_insert_id()");
+				await sql.query("update atividade a set a.nome = concat((select nome from secao s where s.id = a.idsecao), a.sufixo) where a.id = ?", atividade.id);
+
+				await sql.commit();
 
 				return null;
 			} catch (e) {
 				if (e.code) {
 					switch (e.code) {
-						case "ER_DUP_ENTRY":
-							return "Já existe uma atividade com essa combinação de livro / capítulo / seção";
+						//case "ER_DUP_ENTRY":
+						//	return "Já existe uma atividade com essa combinação de livro / capítulo / seção";
 						case "ER_NO_REFERENCED_ROW":
 						case "ER_NO_REFERENCED_ROW_2":
 							res = "Livro ou seção não encontrada";
@@ -123,17 +127,23 @@ class Atividade {
 
 		return app.sql.connect(async (sql) => {
 			try {
-				await sql.query("update atividade set nome = ?, url = ?, idlivro = ?, capitulo = ?, idsecao = ? where id = ?", [atividade.nome, atividade.url, atividade.idlivro, atividade.capitulo, atividade.idsecao, atividade.id]);
+				await sql.beginTransaction();
+
+				await sql.query("update atividade set sufixo = ?, idlivro = ?, capitulo = ?, idsecao = ? where id = ?", [atividade.sufixo, atividade.idlivro, atividade.capitulo, atividade.idsecao, atividade.id]);
 
 				if (!sql.affectedRows)
 					return "Atividade não encontrada";
+
+				await sql.query("update atividade a set a.nome = concat((select nome from secao s where s.id = a.idsecao), a.sufixo) where a.id = ?", atividade.id);
+
+				await sql.commit();
 
 				return null;
 			} catch (e) {
 				if (e.code) {
 					switch (e.code) {
-						case "ER_DUP_ENTRY":
-							return "Já existe uma atividade com essa combinação de livro / capítulo / seção";
+						//case "ER_DUP_ENTRY":
+						//	return "Já existe uma atividade com essa combinação de livro / capítulo / seção";
 						case "ER_NO_REFERENCED_ROW":
 						case "ER_NO_REFERENCED_ROW_2":
 							res = "Livro ou seção não encontrada";

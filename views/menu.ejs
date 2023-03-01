@@ -1,27 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br">
 <head>
-    <%- include("cabecalho") %>
+	<%- include("cabecalho") %>
 
 	<%- defineContent("styles") %>
 </head>
 <body>
+
     <div id="wrapper">
 
-		<div id="content-wrapper" class="d-flex flex-column">
+        <div id="content-wrapper" class="d-flex flex-column">
 
-			<div id="content" class="bg">
+            <div id="content" class="bg">
 
-                <div class="container-fluid mt-4 mb-2">
-                
-					<%- body %>
+                <div class="container-fluid mt-4 mb-2"><%- body %></div>
 
-				</div>
             </div>
+
         </div>
+
     </div>
+
     <%- include("rodape") %>
 
-	<%- defineContent("scripts") %>
+    <%- defineContent("scripts") %>
+
 </body>
 </html>

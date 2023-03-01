@@ -49,17 +49,18 @@ class IndexRoute {
 		else{
 			if(u.idperfil == Perfil.Aluno){
 				const ano = (new Date()).getFullYear();
-			res.render("index/notas", {
-				layout: "layout-sem-form",
-				titulo: "Notas",
-				datatables: true,
-				usuario: u,
-				notas: await Turma.notasAluno(ano, u.id),
-				situacao: await Turma.situacaoPorAluno(ano, u.id)
-			});
-		}else{
-			res.redirect(app.root + "/acesso");
-		}
+				res.render("index/notas", {
+					layout: "layout-sem-form",
+					titulo: "Notas",
+					datatables: true,
+					usuario: u,
+					notas: await Turma.notasAluno(ano, u.id),
+					situacao: await Turma.situacaoPorAluno(ano, u.id)
+				});
+			}else{
+				// @@@ relatório de notas do professor
+				res.render("index/erro", { layout: "layout-externo", mensagem: "Não implementado", erro: "Não implementado" });
+			}
 		}
 	}
 

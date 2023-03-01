@@ -10,8 +10,8 @@
 
 	<div class="col-sm-6">
 		<div class="form-group">
-			<label for="url">URL</label>
-			<input id="url" name="url" class="form-control" type="text" maxlength="100" value="<%=(item ? item.url : "") %>" />
+			<label for="sufixo">Sufixo</label>
+			<input id="sufixo" name="sufixo" class="form-control" type="text" maxlength="10" value="<%=(item ? item.sufixo : "") %>" />
 		</div>
 	</div>
 </div>
@@ -56,12 +56,6 @@
 
 	$("#form").validate({
 		rules: {
-			nome: {
-				required: true
-			},
-			url: {
-				required: true
-			},
 			idlivro: {
 				required: true
 			},

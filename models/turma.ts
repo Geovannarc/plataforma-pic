@@ -141,7 +141,7 @@ class Turma {
 
 	public static listarAtividades(idturma: number): Promise<Turma[]> {
 		return app.sql.connect(async (sql) => {
-			return (await sql.query("select a.id, a.capitulo, a.idsecao, a.nome, a.url, al.id idliberacao from turma t inner join atividade a on a.idlivro = t.idlivro left join turma_atividade_liberada al on al.idturma = t.id and al.idatividade = a.id where t.id = ? order by a.capitulo, a.idsecao", [idturma])) || [];
+			return (await sql.query("select a.id, a.capitulo, a.idsecao, a.nome, al.id idliberacao from turma t inner join atividade a on a.idlivro = t.idlivro left join turma_atividade_liberada al on al.idturma = t.id and al.idatividade = a.id where t.id = ? order by a.capitulo, a.idsecao", [idturma])) || [];
 		});
 	}
 
@@ -524,7 +524,7 @@ class Turma {
 
 	public static async liberadasPorTurma(ano: number, idusuario: number): Promise<any[]>{
 		return app.sql.connect(async (sql) => {
-			const situacao = await sql.query(`SELECT idatividade, atividade.nome, url, atividade.capitulo, capitulo.nome nomecapitulo, idsecao
+			const situacao = await sql.query(`SELECT idatividade, atividade.nome, atividade.capitulo, capitulo.nome nomecapitulo, idsecao
 			FROM usuario
 			INNER JOIN turma_usuario ON usuario.id = turma_usuario.idusuario
 			INNER JOIN turma_atividade_liberada ON turma_atividade_liberada.idturma = turma_usuario.idturma

@@ -2,7 +2,7 @@
 enum Secao {
 	ExplorandoIdeias = 1,
 	Aprendendo = 2,
-	Atividades = 3,
+	Atividade = 3,
 	Conectando = 4,
 	VamosJogar = 5
 };

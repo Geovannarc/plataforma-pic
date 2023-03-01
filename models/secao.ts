@@ -6,7 +6,7 @@ import Secao = require("../enums/secao");
 const secoes = new ListaNomeada([
 	new ItemNomeado(Secao.ExplorandoIdeias, "EXPLORANDO IDEIAS"),
 	new ItemNomeado(Secao.Aprendendo, "APRENDENDO"),
-	new ItemNomeado(Secao.Atividades, "ATIVIDADES"),
+	new ItemNomeado(Secao.Atividade, "ATIVIDADE"),
 	new ItemNomeado(Secao.Conectando, "CONECTANDO"),
 	new ItemNomeado(Secao.VamosJogar, "VAMOS JOGAR")
 ]);

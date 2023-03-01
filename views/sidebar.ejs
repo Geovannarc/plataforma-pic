@@ -9,8 +9,13 @@
 	<!-- Para deixar sempre em destaque, basta adicionar a classe active -->
 	<li class="nav-item active">
 		<a class="nav-link" href="<%- root %>/">
+			<% if (usuario.idperfil == Perfil.Aluno) { %>
+			<i class="fas fa-fw fa-tachometer-alt"></i>
+			<span>Atividades</span>
+			<% } else { %>
 			<i class="fas fa-fw fa-tachometer-alt"></i>
 			<span>Dashboard</span>
+			<% } %>
 		</a>
 	</li>
 
@@ -70,7 +75,7 @@
 
 	<hr class="sidebar-divider">
 
-	<% if (usuario.idperfil == 2) { %>
+	<% if (usuario.idperfil == Perfil.Professor) { %>
 		<div class="sidebar-heading">
 			Gerenciar
 		</div>
@@ -81,18 +86,18 @@
 			</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" href="<%- root %>/notas?id=<%- usuario.id %>">
+			<a class="nav-link" href="<%- root %>/notas">
 				<i class="fas fa-fw fa-clipboard-list"></i>
 				<span>Relatórios de notas</span>
 			</a>
 		</li>
 
 	<% } %>
-	<% if (usuario.idperfil == 3) { %>
+	<% if (usuario.idperfil == Perfil.Aluno) { %>
 		<li class="nav-item">
-			<a class="nav-link" href="<%- root %>/notas?id=<%- usuario.id %>">
+			<a class="nav-link" href="<%- root %>/notas">
 				<i class="fas fa-fw fa-clipboard-list"></i>
-				<span>Minhas notas</span>
+				<span>Notas</span>
 			</a>
 		</li>
 	<% } %>
