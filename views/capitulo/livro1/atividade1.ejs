@@ -1,0 +1,74 @@
+<p class="pergunta" id="pergunta"></p>
+    <div class="row" id="alternativas">
+    </div>
+
+<script>
+    let selected = 0;
+
+    function bgColor(id){
+        element = document.getElementById(id)
+        if(element.style.backgroundColor == "white" || !element.style.backgroundColor){
+            element.style.backgroundColor = "#8bd38b"
+            $("#proximo").prop('disabled', false)
+            selected++
+        }else{
+            element.style.backgroundColor = "white"
+            if(selected > 0){
+                selected--
+            }
+            if(selected == 0){
+                $("#proximo").prop('disabled', true)
+            }
+        }
+    }
+
+    let perguntas = ["Quais destes jogos de tabuleiro você conhece?", "Você sabe qual desses jogos é o xadrez?"]
+    $(window).on("load",function(){
+        $('#pergunta').html(perguntas[0])
+        for(let i = 1; i < 5; i++){
+            $('#alternativas').append(`<div class="col-sm-3 text-center">
+            <img class="alternativas" id="alt-${i}" src="/public/img/tabuleiro-${i}.jpg" style="max-width: 100%;" alt="tabuleiro"/>
+            </div>`)
+        }
+        $("#alt-1").on("click", function(){
+           bgColor('alt-1')
+        })
+        $("#alt-2").on("click", function(){
+            bgColor('alt-2')
+        })
+        $("#alt-3").on("click", function(){
+            bgColor('alt-3')
+        })
+        $("#alt-4").on("click", function(){
+            bgColor('alt-4')
+        })
+    } )
+
+    $("#proximo").on("click", function(){
+        $('#pergunta').html(perguntas[1])
+        $("#alt-1").css("background-color", "white")
+        $("#alt-2").css("background-color", "white")
+        $("#alt-3").css("background-color", "white")
+        $("#alt-4").css("background-color", "white")
+        selected = 0;
+    })
+
+</script>
+<style>
+    .pergunta{
+        font-family: 'Yomogi', cursive;
+        text-align: center;
+        font-size: 2em;
+        border-radius: 10px;
+        background-color: white;
+        padding: 10px;
+    }
+
+    .alternativas{
+        background-color: white;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        cursor: pointer;
+    }
+</style>

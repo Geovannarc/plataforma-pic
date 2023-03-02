@@ -7,7 +7,7 @@
     <div class="container-fluid mt-5 mb-5" style="padding: 0 2em 0 2em;">
         <div class="progress" style="background-color: #e3d4c5;">
             <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
-            aria-valuenow="<%- lista.percaprovadas %> " aria-valuemin="0" aria-valuemax="100" style="width:<%- lista.percaprovadas %>%">
+            aria-valuenow="<%- parseInt(lista.percaprovadas) || 0 %> " aria-valuemin="0" aria-valuemax="100" style="width:<%- parseInt(lista.percaprovadas) || 0%>%">
             <%= lista.percaprovadas %>%
             </div>
         </div>
