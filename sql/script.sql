@@ -77,7 +77,7 @@ INSERT INTO capitulo (idlivro, capitulo, atividades, nome) VALUES
 (2, 6, 0, 'Capítulo 2-6');
 
 CREATE TABLE atividade (
-  id int NOT NULL,
+  id int NOT NULL AUTO_INCREMENT,
   nome varchar(100) NOT NULL,
   sufixo varchar(10) NOT NULL,
   idlivro int NOT NULL,
@@ -90,13 +90,27 @@ CREATE TABLE atividade (
   CONSTRAINT atividade_idsecao_FK FOREIGN KEY (idsecao) REFERENCES secao (id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
-INSERT INTO atividade (id, sufixo, idlivro, capitulo, idsecao) VALUES
-(1, '', 1, 1, 1), -- Explorando Ideias
-(2, '', 1, 1, 2), -- Aprendendo
-(3, ' - 1', 1, 1, 3), -- Atividade
-(4, ' - 2', 1, 1, 3), -- Atividade
-(5, '', 1, 1, 4), -- Conectando
-(6, '', 1, 1, 5); -- Vamos Jogar
+INSERT INTO atividade (nome, sufixo, idlivro, capitulo, idsecao) VALUES
+-- Livro 1 - Capítulo 1
+('', '', 1, 1, 1), -- Explorando Ideias
+('', '', 1, 1, 2), -- Aprendendo
+('', ' - 1', 1, 1, 3), -- Atividade
+('', ' - 2', 1, 1, 3), -- Atividade
+('', '', 1, 1, 4), -- Conectando
+('', '', 1, 1, 5), -- Vamos Jogar
+-- Livro 1 - Capítulo 2
+('', '', 1, 2, 1), -- Explorando Ideias
+('', ' - 1', 1, 2, 2), -- Aprendendo
+('', ' - 1', 1, 2, 3), -- Atividade
+('', ' - 2', 1, 2, 3), -- Atividade
+('', ' - 3', 1, 2, 3), -- Atividade
+('', ' - 2', 1, 2, 2), -- Aprendendo
+('', ' - 4', 1, 2, 3), -- Atividade
+('', ' - 5', 1, 2, 3), -- Atividade
+('', '', 1, 2, 4), -- Conectando
+('', ' - 1', 1, 2, 5), -- Vamos Jogar
+('', ' - 2', 1, 2, 5), -- Vamos Jogar
+('', ' - 3', 1, 2, 5); -- Vamos Jogar
 
 UPDATE atividade a SET a.nome = CONCAT((SELECT nome FROM secao s WHERE s.id = a.idsecao), a.sufixo) WHERE a.id > 0;
 UPDATE capitulo c SET c.atividades = (SELECT COUNT(id) FROM atividade a WHERE a.idlivro = c.idlivro AND a.capitulo = c.capitulo) WHERE c.idlivro > 0;
