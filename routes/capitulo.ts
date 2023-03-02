@@ -14,11 +14,10 @@ class CapituloRoute {
             const ano = (new Date()).getFullYear();
             let atividade = parseInt(req.params["id"] as string);
             let livro = parseInt(req.params["l"] as string);
-            const atividades = await Turma.atividadesDoAlunoCasoEstejaLiberada(ano, u.id, atividade, livro);
+            const atividades = await Turma.atividadesDoCapituloCasoEstejaLiberadaParaAluno(ano, u.id, atividade, livro);
             if(atividades){
                 res.render("capitulo/index", {
-                    layout: "menu",
-                    titulo: " ",
+                    layout: "layout-externo-sem-card",
                     usuario: u,
                     atividade: atividade,
                     livro: livro,

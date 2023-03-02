@@ -1,3 +1,363 @@
+<div id="main">
+	<%
+		let atividadeAtual;
+		for (let i of liberadas) {
+			if (i.idatividade == atividade) {
+				atividadeAtual = i;
+				break;
+			}
+		}
+
+	%>
+	<div class="container-fluid container-main">
+		<div class="text-left">
+			<a href="<%- root %>/"><i class="fas fa-arrow-left fa-2x"></i></a>
+			<h2 class="text-center titulo"><%=atividadeAtual.nomecapitulo%></h2>    
+		</div>
+		<div class="row row-main">
+			<div class="col-9 col-main">
+				<%- include("livro" + livro + "/atividade" + atividade)%>
+			<div class="pergunta mt-3">
+				<button style="font-size:0.8em;" id="proximo" disabled type="button" class="btn btn-success textura x2"> <i class="fas fa-long-arrow-alt-right"></i> PRÓXIMO</button>
+			</div>
+			</div>
+			<div class="col-3 col-main">
+				<%for (let i of liberadas) {%>
+					<a class="secao secao<%-i.idsecao%>" href='<%staticRoot%>/capitulo/atividade/<%-i.idatividade%>/<%=lista.idlivro%>'>
+						<img class="icone-menu" src="/public/img/icones/icone<%-i.idsecao%>.png" alt=""/><%=i.nome%>
+					</a>
+				<%
+				if (!i.aprovado)
+					break;
+				}
+				%>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="cover" class="fade show"></div>
+
+<%- contentFor("styles") %>
+<style>
+	html {
+		height: 100%;
+		min-height: 100%;
+		max-height: 100%;
+		-webkit-tap-highlight-color: rgba(0,0,0,0);
+	}
+
+	html, #cover {
+		background: #f1f1f1; /* Safari iOS e Opera Android em fullscreen */
+	}
+
+	html {
+		background: url('<%- staticRoot %>/img/sistemax.jpg'); /* Safari iOS e Opera Android em fullscreen */
+		background-position: center;
+		background-size: cover;
+	}
+
+	html, body, button, input, textarea, select, p, div {
+		font-family: sans-serif;
+		font-style: normal;
+		font-weight: 400;
+		line-height: 1;
+	}
+
+	p {
+		margin: 0;
+	}
+
+	p + p {
+		margin-top: 0.5em;
+	}
+
+	body {
+		padding: 0;
+		margin: 0;
+		background: none;
+		color: #000;
+		width: 100%;
+		height: 100%;
+		min-height: 100%;
+		max-height: 100%;
+		overflow: hidden;
+	}
+
+	#canvas {
+		position: absolute;
+		z-index: 0;
+		overflow: hidden;
+		left: 0;
+		top: 0;
+		width: 0;
+		height: 0;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		pointer-events: none;
+	}
+
+	#main {
+		position: absolute;
+		z-index: 1;
+		overflow: hidden;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		background-color: rgba(241, 241, 241, 0.711);
+	}
+
+	#aviso {
+        font-family: 'Yomogi', cursive;
+		position: absolute;
+		z-index: 9999;
+		left: 0;
+		top: 1em;
+		width: 100%;
+		text-align: center;
+		pointer-events: none;
+	}
+
+	#cover {
+		position: fixed;
+		z-index: 10000;
+		left: 0;
+		top: 0;
+		width: 4px;
+		height: 4px;
+		-webkit-transform-origin: left top;
+		-moz-transform-origin: left top;
+		-o-transform-origin: left top;
+		transform-origin: left top;
+		-webkit-transform: scale(999,999);
+		-moz-transform: scale(999,999);
+		-o-transform: scale(999,999);
+		transform: scale(999,999);
+	}
+
+	.icone-menu {
+        width: 30%;
+        margin: -0.75rem 0.5rem -0.75rem -0.5rem;
+    }
+
+    .secao {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		align-items: center;
+		justify-content: flex-start;
+        font-family: 'Yomogi', cursive;
+        background-image: url('<%- staticRoot %>/img/textura.png');
+        font-size: 0.75rem;
+        padding: 0.5rem !important;
+        width: 90%;
+        border-radius: 0.35rem;
+        margin: 0 0 1rem 0;
+        transform: translate(0, 0);
+        transition: box-shadow ease-in-out 0.3s, transform ease-in-out 0.3s;
+    }
+
+    a:hover {
+        color: white;
+    }
+
+    .titulo {
+        font-family: 'Annie Use Your Telescope', cursive;
+        text-transform: uppercase;
+        font-size: 3rem;
+        font-weight: 300;
+        padding: 0.5rem;
+        display: inline-block; 
+        width: 90%;
+        color: #414141;
+		margin: 0;
+    }
+
+	.container-main {
+		display: flex;
+		flex-direction: column;
+		flex-wrap: nowrap;
+		align-items: stretch;
+		height: 100% !important;
+	}
+
+	.row-main {
+		flex: 1 1 auto;
+	    overflow: hidden;
+	}
+
+	.col-main {
+		padding-left: 0.25rem;
+		padding-right: 0.25rem;
+		height: 100% !important;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+
+	.col-main::-webkit-scrollbar {
+		width: 0.5rem;
+		height: 0.5rem;
+	}
+
+	.col-main::-webkit-scrollbar-corner {
+		background-color: #f1f1f1;
+	}
+
+	.col-main::-webkit-scrollbar-thumb {
+		background-color: #8cacc0;
+	}
+
+	.fade {
+		-webkit-transition: opacity ease-in-out 0.5s;
+		-moz-transition: opacity ease-in-out 0.5s;
+		-o-transition: opacity ease-in-out 0.5s;
+		transition: opacity ease-in-out 0.5s;
+	}
+</style>
+
+<%- contentFor("scripts") %>
+<script type="text/javascript">
+	"use strict";
+
+	let main = document.getElementById("main"),
+		cover = document.getElementById("cover"),
+		iOSOuSafari = (function () {
+			// https://stackoverflow.com/q/9038625/3569421
+			if ((navigator.userAgent.indexOf("Chrome") <= 0 && navigator.userAgent.indexOf("Safari") >= 0) ||
+				(navigator.userAgent.indexOf("Mac") >= 0 && ("ontouchend" in document)))
+				return true;
+			switch (navigator.platform) {
+				case "iPad Simulator":
+				case "iPhone Simulator":
+				case "iPod Simulator":
+				case "iPad":
+				case "iPhone":
+				case "iPod":
+					return true;
+			}
+			return false;
+		})();
+
+	(function () {
+		// Esses são valores de referência! É só ajustar aqui que o resto se adapta!
+		let larguraPadrao = 1280,
+			alturaPadrao = 720,
+			// O tamanho da fonte (1em) vai ser alturaTela / 24 (se quiser mais ou menos, é só ajustar aqui)
+			linhasPorTela = 24,
+			// Quando tamanhoDaFonteInteiro é true, tamanhos de fonte como 12.3, 12.5, 12.95 viram 12
+			tamanhoDaFonteInteiro = true,
+			// Se ocuparTelaUltraWide for false, podem aparecer barras laterais em telas ultrawide
+			ocuparTelaUltraWide = true;
+
+		let larguraTela = 0,
+			alturaTela = 0,
+			tamanhoDaFonte = 0,
+			fatorDeEscala = -1,
+			aviso = null;
+
+		function ajustarJanela() {
+			larguraTela = window.innerWidth,
+			alturaTela = window.innerHeight;
+
+			if (document.documentElement && ("clientWidth" in document.documentElement)) {
+				larguraTela = document.documentElement.clientWidth;
+				alturaTela = document.documentElement.clientHeight;
+			}
+
+			if (iOSOuSafari) {
+				let bodyRect = null;
+
+				if (document.documentElement && ("getBoundingClientRect" in document.documentElement))
+					bodyRect = document.documentElement.getBoundingClientRect();
+				else if (("getBoundingClientRect" in document.body))
+					bodyRect = document.body.getBoundingClientRect();
+
+				if (bodyRect) {
+					larguraTela = bodyRect.right - bodyRect.left;
+					alturaTela = bodyRect.bottom - bodyRect.top;
+				}
+			}
+
+			let transform = "scale(" + Math.ceil(larguraTela * 0.25) + "," + Math.ceil(alturaTela * 0.25) + ")";
+			cover.style["oTransform"] = transform;
+			cover.style["msTransform"] = transform;
+			cover.style["mozTransform"] = transform;
+			cover.style["webkitTransform"] = transform;
+			cover.style.transform = transform;
+
+			let fatorDeEscalaAntigo = fatorDeEscala,
+				ratioAtual = larguraTela / alturaTela,
+				ratioDesejado = larguraPadrao / alturaPadrao,
+				width = larguraTela,
+				height = alturaTela;
+
+			if (ratioAtual >= ratioDesejado) {
+				fatorDeEscala = alturaTela / alturaPadrao;
+				// Tenta ocupar a tela toda em telas ultrawide
+				if (!ocuparTelaUltraWide) {
+					width = larguraPadrao * fatorDeEscala;
+				}
+			} else {
+				fatorDeEscala = larguraTela / larguraPadrao;
+				height = alturaPadrao * fatorDeEscala;
+			}
+
+			var left = ((larguraTela - width) * 0.5) | 0,
+				top = ((alturaTela - height) * 0.5) | 0;
+			if (left < 0) {
+				left = 0;
+			}
+			if (top < 0) {
+				top = 0;
+			}
+
+			main.style.left = left + "px";
+			main.style.top = top + "px";
+			main.style.width = width + "px";
+			main.style.height = height + "px";
+
+			if (larguraTela <= alturaTela) {
+				if (!aviso) {
+					aviso = document.createElement("div");
+					aviso.setAttribute("id", "aviso");
+					aviso.textContent = "A página funciona melhor no modo paisagem (deitada)";
+					document.body.appendChild(aviso);
+				}
+			} else if (aviso) {
+				document.body.removeChild(aviso);
+				aviso = null;
+			}
+
+			if (fatorDeEscala !== fatorDeEscalaAntigo) {
+				tamanhoDaFonte = height / linhasPorTela;
+				if (tamanhoDaFonteInteiro) {
+					tamanhoDaFonte = tamanhoDaFonte | 0;
+				}
+
+				var fontSize = tamanhoDaFonte + "px";
+				if (document.documentElement) {
+					document.documentElement.style.fontSize = fontSize;
+				}
+				document.body.style.fontSize = fontSize;
+			}
+		}
+
+		window.addEventListener("resize", ajustarJanela);
+
+		ajustarJanela();
+
+		setTimeout(function () {
+			cover.className = "fade";
+
+			setTimeout(() => {
+				document.body.removeChild(cover);
+
+				// Se fosse um jogo, poderia "dar start" na tela inicial aqui :)
+			}, 500);
+		}, 50);
+	})();
+</script>
+
 <script type="text/javascript">
     const atividade = parseInt("<%= atividade %>");
     const livro = parseInt("<%= livro %>");
@@ -26,23 +386,7 @@
 			larguraCanvas = 0,
 			alturaCanvas = 0,
 			escalaFolhas = 1,
-			horaAnterior = 0,
-			iOSOuSafari = (function () {
-				// https://stackoverflow.com/q/9038625/3569421
-				if ((navigator.userAgent.indexOf("Chrome") <= 0 && navigator.userAgent.indexOf("Safari") >= 0) ||
-					(navigator.userAgent.indexOf("Mac") >= 0 && ("ontouchend" in document)))
-					return true;
-				switch (navigator.platform) {
-					case "iPad Simulator":
-					case "iPhone Simulator":
-					case "iPod Simulator":
-					case "iPad":
-					case "iPhone":
-					case "iPod":
-						return true;
-				}
-				return false;
-			})();
+			horaAnterior = 0;
 
 		canvas.setAttribute("id", "canvas");
 		document.body.appendChild(canvas);
@@ -154,139 +498,3 @@
 			carregarImgFolha(i);
 	}, 10);
 </script>
-<%
-	let cores = [
-		"secao1",
-		"secao2",
-		"secao3",
-		"secao4",
-		"secao5"
-	];
-%>
-
-<%let i;
-for(let item of liberadas){
-    if(item.idatividade == atividade){
-        i = liberadas.indexOf(item)
-    }
-}%>
-<div class="container-fluid c">
-    <div style="text-align: left; margin-top: 1em;">
-        <a class="middle" href="/"><i class="fas fa-arrow-left fa-2x"></i></a>
-        <h2 class="text-center titulo middle"><%=liberadas[i].nomecapitulo%></h2>    
-    </div>
-        <div class="row">
-            <div class="col-sm-9 bg-1">
-                <%- include("livro" + livro + "/atividade" + atividade)%>
-            <div class="pergunta mt-3">
-                <button style="font-size:0.8em;" id="proximo" disabled type="button" class="btn btn-success textura x2"> <i class="fas fa-long-arrow-alt-right"></i> PRÓXIMO</button>
-            </div>
-            </div>
-            <div class="col-sm-3 lista-secoes">
-                <%for(let i = 0; i < secoes.length; i++){%>
-                    <a class="secao <%-cores[i]%>" href='<%staticRoot%>/capitulo/atividade/<%=i+1%>/<%=lista.idlivro%>'>
-                        <img class="icone-menu" src="/public/img/icones/icone<%-(i+1)%>.png" alt=""/><%=secoes[i].nome%>
-                    </a>
-                <%}%>
-            </div>
-        </div>
-</div>
-
-<%- contentFor("styles") %>
-<style>
-
-html {
-		height: 100%;
-		min-height: 100%;
-		max-height: 100%;
-		-webkit-tap-highlight-color: rgba(0,0,0,0);
-	}
-
-	html {
-		background: url('<%- staticRoot %>/img/sistemax.jpg'); /* Safari iOS e Opera Android em fullscreen */
-		background-position: center;
-		background-size: cover;
-	}
-
-	html, body, button, input, textarea, select, p, div {
-		font-family: sans-serif;
-		font-style: normal;
-		font-weight: 400;
-		line-height: 1;
-	}
-
-	body {
-		padding: 0;
-		margin: 0;
-		background: none;
-		color: #fff;
-		width: 100%;
-		height: 100%;
-		min-height: 100%;
-		max-height: 100%;
-		overflow: hidden;
-	}
-
-	#canvas {
-		position: absolute;
-		z-index: 1;
-		overflow: hidden;
-		left: 0;
-		top: 0;
-		width: 0;
-		height: 0;
-		margin: 0;
-		padding: 0;
-		border: 0;
-		pointer-events: none;
-	}
-
-    .textura{
-        background-image: url('/public/img/textura.png');
-    }
-
-    .icone-menu{
-        width: 30%;
-        max-width: 100px;
-        margin: -0.75em 0.5em -0.75em -0.5em;
-    }
-
-    .secao{
-        font-family: 'Yomogi', cursive;
-        background-image: url('/public/img/textura.png');
-        font-size: 2em;
-        padding: 0.75em !important;
-        display: block;
-        width: 100%;
-        border-radius: 0.75em;
-        margin-bottom: 1.8em;
-        transform: translate(0px, 0px);
-        transition: box-shadow ease-in-out 0.3s, transform ease-in-out 0.3s;
-    }
-
-    a:hover{
-        color: white;
-    }
-
-    .color-white{
-        color: white;
-    }
-
-    .c{
-        background-color: rgba(241, 241, 241, 0.711);
-        z-index: 10000;
-        position: relative;
-    }
-
-    .titulo{
-        font-family: 'Annie Use Your Telescope', cursive;
-        text-transform: uppercase;
-        font-size: 4em;
-        font-weight: 300;
-        padding: 30px;
-        display: inline-block; 
-        width: 90%;
-        color: #414141;
-    }
-
-</style>

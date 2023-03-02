@@ -68,7 +68,6 @@ class AtividadeRoute {
             let id = parseInt(req.query["id"] as string);
 			res.render("atividade/aula", {
 				layout: "layout-sem-form",
-				titulo: " ",
 				datatables: true,
 				usuario: u,
                 id: id,

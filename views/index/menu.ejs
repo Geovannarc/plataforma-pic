@@ -1,25 +1,88 @@
-<div class="text-center">
-
-    <div style="text-align: left; margin-top: 1em;">
-        <a class="" href="/notas"><i class="fas fa-arrow-left fa-2x"></i></a>
-    </div>
-
-    <div class="container-fluid mt-5 mb-5" style="padding: 0 2em 0 2em;">
-        <div class="progress" style="background-color: #e3d4c5;">
-            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
-            aria-valuenow="<%- parseInt(lista.percaprovadas) || 0 %> " aria-valuemin="0" aria-valuemax="100" style="width:<%- parseInt(lista.percaprovadas) || 0%>%">
-            <%= lista.percaprovadas %>%
+<div class="container-main text-center m-3">
+    <div class="m-0 mb-3 row container-header">
+        <div class="col-sm-8 row-header">
+            <a class="m-3" href="/notas"><i class="fas fa-arrow-left fa-2x"></i></a>
+            <div class="m-3" style="flex: 1 1 auto;">
+                <h1 class="titulo" style="flex: 1 1 auto;">
+                    <%= situacao.livro %>
+                </h1>
+                <div>
+                    <b>
+                        Turma <%= situacao.nome %> /
+                        Sala <%= situacao.sala %>
+                    </b>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <h3 class="titulo my-3">
+                Progresso
+            </h3>
+            <div class="progress my-3" style="background-color: #e3d4c5;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                aria-valuenow="<%- parseInt(situacao.percaprovadas) || 0 %> " aria-valuemin="0" aria-valuemax="100" style="width:<%- parseInt(situacao.percaprovadas) || 0%>%">
+                <%= situacao.percaprovadas %>%
+                </div>
             </div>
         </div>
     </div>
 
-    <%if(lista.capitulos == 6){%>
+    <%if(situacao.capitulos == 6){%>
     <%- include("caminho") %>
     <%}%>
-    <%if(lista.capitulos == 5){%>
+    <%if(situacao.capitulos == 5){%>
     <%- include("caminho-2") %>
     <%}%>
 </div>
+
+
+<%- contentFor("styles") %>
+<style>
+	html {
+		background: #f1f1f1; /* Safari iOS e Opera Android em fullscreen */
+		background: url('<%- staticRoot %>/img/sistemax.jpg'); /* Safari iOS e Opera Android em fullscreen */
+		background-position: center;
+		background-size: cover;
+	}
+
+	body {
+		background: none;
+        font-family: 'Yomogi', cursive;
+	}
+
+    .container-main {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: stretch;
+    }
+
+    .container-header {
+		background-color: rgba(241, 241, 241, 0.711);
+	}
+
+    .row-header {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: flex-start;
+    }
+
+    .titulo {
+        font-family: 'Annie Use Your Telescope', cursive;
+        color: #414141;
+    }
+
+    h1.titulo {
+        font-size: 3rem;
+    }
+
+    .progress {
+        height: 2.5rem;
+        font-weight: bold;
+    }
+</style>
 
 <%- contentFor("scripts") %>
 <script type="text/javascript">
@@ -38,7 +101,7 @@
 
     liberarCadeados();
 
-    let situacao = <%- JSON.stringify(lista) %>;
+    let situacao = <%- JSON.stringify(situacao) %>;
 
     function estrelaEopacidade(){
         for (let i = 0; i < situacao.capitulos; i++) {
@@ -66,6 +129,6 @@
     estrelaEopacidade();
 
     function link(id){
-        window.location.href = `<%-root%>/capitulo/atividade/${id}/<%-lista.idlivro%>`;
+        window.location.href = `<%-root%>/capitulo/atividade/-1/<%-situacao.idlivro%>`;
     }
 </script>

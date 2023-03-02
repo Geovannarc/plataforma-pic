@@ -537,14 +537,49 @@ class Turma {
 		})
 	}
 
-	public static async atividadesDoAlunoCasoEstejaLiberada(ano: number, idusuario: number, atividade: number, livro: number): Promise<{ situacao: SituacaoAluno, liberadas: any[] } | null> {
+	public static async atividadesDoCapituloCasoEstejaLiberadaParaAluno(ano: number, idusuario: number, atividade: number, livro: number): Promise<{ situacao: SituacaoAluno, liberadas: any[] } | null> {
 		const situacao = await Turma.situacaoPorAlunoPorCapitulo(ano, idusuario);
 
 		if(situacao && livro == situacao.idlivro){
 			const liberadas = await Turma.liberadasPorTurma(ano, idusuario);
             for(let i of liberadas){
                 if(i.idatividade == atividade){
-                    return {
+					// Remove o que não for do capítulo da atividade liberada em questão
+					for (let j = liberadas.length - 1; j >= 0; j--) {
+						if (liberadas[j].capitulo !== i.capitulo)
+							liberadas.splice(j, 1);
+					}
+
+					if (!(situacao as any).detalhes)
+						return null;
+
+					for (let j = (situacao as any).detalhes.length - 1; j >= 0; j--) {
+						if ((situacao as any).detalhes[j].capitulo !== i.capitulo)
+							(situacao as any).detalhes.splice(j, 1);
+					}
+
+					if (!(situacao as any).detalhes.length)
+						return null;
+
+					await app.sql.connect(async (sql) => {
+						for (let j = liberadas.length - 1; j >= 0; j--)
+							liberadas[j].aprovado = await sql.scalar("select aprovado from turma_usuario_atividade where idturma_usuario = ? and idatividade = ?", [(situacao as any).idturma_usuario, liberadas[j].idatividade]) || 0;
+					});
+
+					liberadas.sort((a, b) => (a.idatividade < b.idatividade ? -1 : 1));
+
+					for (let j = 0; j < liberadas.length; j++) {
+						if (liberadas[j].idatividade === atividade) {
+							// Só pode deixar prosseguir / considerar como liberada se o aluno
+							// já concluiu a atividade anterior, ou se esse for a primeira
+							if (j > 0 && !liberadas[j - 1].aprovado)
+								return null;
+
+							break;
+						}
+					}
+
+					return {
 						situacao,
 						liberadas
 					};

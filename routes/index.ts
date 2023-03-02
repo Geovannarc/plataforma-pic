@@ -20,10 +20,9 @@ class IndexRoute {
 		}else{
 			const ano = (new Date()).getFullYear();
 			res.render("index/menu", {
-				layout: "menu",
-				titulo: " ",
+				layout: "layout-externo-sem-card",
 				usuario: u,
-				lista: await Turma.situacaoPorAlunoPorCapitulo(ano, u.id),
+				situacao: await Turma.situacaoPorAlunoPorCapitulo(ano, u.id),
 				atividades: await Turma.notasAluno(ano, u.id),
 				liberadas: await Turma.liberadasPorTurma(ano, u.id)
 			});
