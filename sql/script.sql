@@ -83,34 +83,36 @@ CREATE TABLE atividade (
   idlivro int NOT NULL,
   capitulo int NOT NULL,
   idsecao int NOT NULL,
+  ordem int NOT NULL,
   PRIMARY KEY (id),
   KEY atividade_idlivro_capitulo_idsecao_IX (idlivro, capitulo, idsecao),
+  KEY atividade_idlivro_capitulo_ordem_IX (idlivro, capitulo, ordem),
   KEY atividade_idsecao_IX (idsecao),
   CONSTRAINT atividade_idlivro_FK FOREIGN KEY (idlivro) REFERENCES livro (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT atividade_idsecao_FK FOREIGN KEY (idsecao) REFERENCES secao (id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
-INSERT INTO atividade (nome, sufixo, idlivro, capitulo, idsecao) VALUES
+INSERT INTO atividade (nome, sufixo, idlivro, capitulo, idsecao, ordem) VALUES
 -- Livro 1 - Capítulo 1
-('', '', 1, 1, 1), -- Explorando Ideias
-('', '', 1, 1, 2), -- Aprendendo
-('', ' - 1', 1, 1, 3), -- Atividade
-('', ' - 2', 1, 1, 3), -- Atividade
-('', '', 1, 1, 4), -- Conectando
-('', '', 1, 1, 5), -- Vamos Jogar
+('', '', 1, 1, 1, 1), -- Explorando Ideias
+('', '', 1, 1, 2, 2), -- Aprendendo
+('', ' - 1', 1, 1, 3, 3), -- Atividade
+('', ' - 2', 1, 1, 3, 4), -- Atividade
+('', '', 1, 1, 4, 5), -- Conectando
+('', '', 1, 1, 5, 6), -- Vamos Jogar
 -- Livro 1 - Capítulo 2
-('', '', 1, 2, 1), -- Explorando Ideias
-('', ' - 1', 1, 2, 2), -- Aprendendo
-('', ' - 1', 1, 2, 3), -- Atividade
-('', ' - 2', 1, 2, 3), -- Atividade
-('', ' - 3', 1, 2, 3), -- Atividade
-('', ' - 2', 1, 2, 2), -- Aprendendo
-('', ' - 4', 1, 2, 3), -- Atividade
-('', ' - 5', 1, 2, 3), -- Atividade
-('', '', 1, 2, 4), -- Conectando
-('', ' - 1', 1, 2, 5), -- Vamos Jogar
-('', ' - 2', 1, 2, 5), -- Vamos Jogar
-('', ' - 3', 1, 2, 5); -- Vamos Jogar
+('', '', 1, 2, 1, 1), -- Explorando Ideias
+('', ' - 1', 1, 2, 2, 2), -- Aprendendo
+('', ' - 1', 1, 2, 3, 3), -- Atividade
+('', ' - 2', 1, 2, 3, 4), -- Atividade
+('', ' - 3', 1, 2, 3, 5), -- Atividade
+('', ' - 2', 1, 2, 2, 6), -- Aprendendo
+('', ' - 4', 1, 2, 3, 7), -- Atividade
+('', ' - 5', 1, 2, 3, 8), -- Atividade
+('', '', 1, 2, 4, 9), -- Conectando
+('', ' - 1', 1, 2, 5, 10), -- Vamos Jogar
+('', ' - 2', 1, 2, 5, 11), -- Vamos Jogar
+('', ' - 3', 1, 2, 5, 12); -- Vamos Jogar
 
 UPDATE atividade a SET a.nome = CONCAT((SELECT nome FROM secao s WHERE s.id = a.idsecao), a.sufixo) WHERE a.id > 0;
 UPDATE capitulo c SET c.atividades = (SELECT COUNT(id) FROM atividade a WHERE a.idlivro = c.idlivro AND a.capitulo = c.capitulo) WHERE c.idlivro > 0;
@@ -168,6 +170,7 @@ CREATE TABLE turma_usuario_atividade (
   conclusao datetime NOT NULL,
   PRIMARY KEY (id),
   KEY turma_usuario_atividade_idturma_usuario_idatividade_aprovado_IX (idturma_usuario, idatividade, aprovado),
+  KEY turma_usuario_atividade_idturma_usuario_aprovado_IX (idturma_usuario, aprovado),
   KEY turma_usuario_atividade_idatividade_IX (idatividade),
   CONSTRAINT turma_usuario_atividade_idturma_usuario_FK FOREIGN KEY (idturma_usuario) REFERENCES turma_usuario (id) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT turma_usuario_atividade_idatividade_FK FOREIGN KEY (idatividade) REFERENCES atividade (id) ON DELETE CASCADE ON UPDATE RESTRICT

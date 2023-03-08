@@ -23,7 +23,7 @@
 			</div>
 			<div class="col-3 col-main">
 				<%for (let i of liberadas) {%>
-					<a class="secao secao<%-i.idsecao%>" href='<%staticRoot%>/capitulo/atividade/<%-i.idatividade%>/<%=lista.idlivro%>'>
+					<a class="secao secao<%-i.idsecao%>" href='<%staticRoot%>/capitulo/atividade/<%=lista.idlivro%>/<%-i.capitulo%>/<%-i.idatividade%>'>
 						<img class="icone-menu" src="/public/img/icones/icone<%-i.idsecao%>.png" alt=""/><%=i.nome%>
 					</a>
 				<%

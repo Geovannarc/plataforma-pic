@@ -537,13 +537,37 @@ class Turma {
 		})
 	}
 
-	public static async atividadesDoCapituloCasoEstejaLiberadaParaAluno(ano: number, idusuario: number, atividade: number, livro: number): Promise<{ situacao: SituacaoAluno, liberadas: any[] } | null> {
+	public static async atividadesDoCapituloCasoEstejaLiberadaParaAluno(ano: number, idusuario: number, idlivro: number, capitulo: number, idatividade?: number): Promise<{ situacao: SituacaoAluno, liberadas: any[], idatividade: number } | null> {
 		const situacao = await Turma.situacaoPorAlunoPorCapitulo(ano, idusuario);
 
-		if(situacao && livro == situacao.idlivro){
+		if(situacao && idlivro == situacao.idlivro){
+			if (!idatividade) {
+				// Precisa pegar o idatividade da última atividade aprovada do livro/capítulo fornecidos
+				await app.sql.connect(async (sql) => {
+					const ultimaAtividadeAprovadaDoCapitulo = await sql.query("select a.id, a.ordem from turma_usuario_atividade ta inner join atividade a on a.id = ta.idatividade where ta.idturma_usuario = ? and ta.aprovado = 1 and a.idlivro = ? and a.capitulo = ? order by a.ordem desc limit 1", [(situacao as any).idturma_usuario, idlivro, capitulo]) as { id: number, ordem: number }[];
+					if (!ultimaAtividadeAprovadaDoCapitulo || !ultimaAtividadeAprovadaDoCapitulo.length) {
+						// Pega o id da primeira atividade desse livro/capítulo
+						idatividade = (await sql.scalar("select id from atividade where idlivro = ? and capitulo = ? and ordem = 1", [idlivro, capitulo]) as number) || 0;
+					} else {
+						// Pega o id da próxima atividade a se feita pelo aluno nesse livro/capítulo
+						idatividade = (await sql.scalar("select id from atividade where idlivro = ? and capitulo = ? and ordem = ?", [idlivro, capitulo, ultimaAtividadeAprovadaDoCapitulo[0].ordem + 1]) as number) || 0;
+						if (!idatividade) {
+							// Se não existir outra atividade para ser feita nesse livro/capítulo, exibe a última atividade feita
+							idatividade = ultimaAtividadeAprovadaDoCapitulo[0].id;
+						} else {
+							// Apesar de existir uma próxima atividade a ser feita nesse livro/capítulo, confere se ela está
+							// liberada (se não tiver, exibe a última atividade feita)
+							const idturma_atividade_liberada = (await sql.scalar("select id from turma_atividade_liberada where idturma = ? and idatividade = ?", [(situacao as any).id, idatividade]) as number) || 0;
+							if (!idturma_atividade_liberada)
+								idatividade = ultimaAtividadeAprovadaDoCapitulo[0].id;
+						}
+					}
+				});
+			}
+
 			const liberadas = await Turma.liberadasPorTurma(ano, idusuario);
             for(let i of liberadas){
-                if(i.idatividade == atividade){
+                if(i.idatividade == idatividade){
 					// Remove o que não for do capítulo da atividade liberada em questão
 					for (let j = liberadas.length - 1; j >= 0; j--) {
 						if (liberadas[j].capitulo !== i.capitulo)
@@ -569,7 +593,7 @@ class Turma {
 					liberadas.sort((a, b) => (a.idatividade < b.idatividade ? -1 : 1));
 
 					for (let j = 0; j < liberadas.length; j++) {
-						if (liberadas[j].idatividade === atividade) {
+						if (liberadas[j].idatividade === idatividade) {
 							// Só pode deixar prosseguir / considerar como liberada se o aluno
 							// já concluiu a atividade anterior, ou se esse for a primeira
 							if (j > 0 && !liberadas[j - 1].aprovado)
@@ -581,7 +605,8 @@ class Turma {
 
 					return {
 						situacao,
-						liberadas
+						liberadas,
+						idatividade
 					};
                 }
             }

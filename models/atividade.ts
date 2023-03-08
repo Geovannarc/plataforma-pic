@@ -13,17 +13,20 @@ interface Atividade {
 }
 
 class Atividade {
-	public static async registrarTentativa(idturma: number, idusuario: number, idatividade: number, nota: number): Promise<string | null> {
+	public static async registrarTentativa(idturma: number, idusuario: number, idatividade: number, nota: number, aprovado: number): Promise<string | null> {
 		if (!idturma || !idusuario || !idatividade)
 			return "Dados inválidos";
 
 		if (isNaN(nota) || nota < 0 || nota > 100)
 			return "Nota inválida";
 
-		return app.sql.connect(async (sql) => {
-			const liberada = await sql.scalar("select id from turma_atividade_liberada where idturma = ? and idatividade = ?", [idturma, idatividade]) as number | null;
+		if (isNaN(aprovado) || aprovado < 0 || aprovado > 1)
+			return "Aprovação inválida";
 
-			if (!liberada)
+		return app.sql.connect(async (sql) => {
+			const liberada = await sql.query("select a.idlivro, a.capitulo, a.ordem from turma_atividade_liberada tl inner join atividade a on a.id = tl.idatividade where tl.idturma = ? and tl.idatividade = ?", [idturma, idatividade]) as { idlivro: number, capitulo: number, ordem: number }[] | null;
+
+			if (!liberada || !liberada.length)
 				return "Atividade não encontrada ou ainda não liberada";
 
 			const idturma_usuario = await sql.scalar("select id from turma_usuario where idturma = ? and idusuario = ?", [idturma, idusuario]) as number | null;
@@ -31,7 +34,15 @@ class Atividade {
 			if (!idturma_usuario)
 				return "Turma ou aluno não encontrado";
 
-			await sql.query("insert into turma_usuario_atividade (idturma_usuario, idatividade, nota, conclusao) values (?, ?, ?, ?)", [idturma_usuario, idatividade, nota, DataUtil.horarioDeBrasiliaISOComHorario()]);
+			const maiorOrdemAprovadaDoCapitulo = (await sql.scalar("select a.ordem from turma_usuario_atividade ta inner join atividade a on a.id = ta.idatividade where ta.idturma_usuario = ? and ta.aprovado = 1 and a.idlivro = ? and a.capitulo = ? order by a.ordem desc limit 1", [idturma_usuario, liberada[0].idlivro, liberada[0].capitulo]) as number) || 0;
+
+			if (liberada[0].ordem <= maiorOrdemAprovadaDoCapitulo)
+				return "Atividade já foi concluída";
+
+			if (liberada[0].ordem > (maiorOrdemAprovadaDoCapitulo + 1))
+				return "Ainda existem atividades anteriores para serem concluídas";
+
+			await sql.query("insert into turma_usuario_atividade (idturma_usuario, idatividade, nota, aprovado, conclusao) values (?, ?, ?, ?, ?)", [idturma_usuario, idatividade, nota, aprovado, DataUtil.horarioDeBrasiliaISOComHorario()]);
 
 			return null;
 		})
