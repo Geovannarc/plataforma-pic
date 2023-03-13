@@ -15,7 +15,7 @@ class IndexRoute {
 				layout: "layout-sem-form",
 				titulo: "Dashboard",
 				usuario: u,
-				lista: await Turma.situacaoPorProfessor(2022, u.id)
+				lista: await Turma.situacaoPorProfessor((new Date()).getFullYear(), u.id)
 			});
 		}else{
 			const ano = (new Date()).getFullYear();
