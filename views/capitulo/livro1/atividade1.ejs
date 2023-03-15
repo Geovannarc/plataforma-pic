@@ -44,14 +44,48 @@
         })
     } )
 
-    $("#proximo").on("click", function(){
-        $('#pergunta').html(perguntas[1])
-        $("#alt-1").css("background-color", "white")
-        $("#alt-2").css("background-color", "white")
-        $("#alt-3").css("background-color", "white")
-        $("#alt-4").css("background-color", "white")
-        selected = 0;
-    })
+    // $("#proximo").on("click", function(){
+    //     $('#pergunta').html(perguntas[1])
+    //     $("#alt-1").css("background-color", "white")
+    //     $("#alt-2").css("background-color", "white")
+    //     $("#alt-3").css("background-color", "white")
+    //     $("#alt-4").css("background-color", "white")
+    //     selected = 0;
+    // })
+
+    
+	$(() => { 
+        $("#proximo").on("click", function(){
+		if (JsonWebApi.active)
+			return;
+
+        let aprovado, nota;
+
+        let idturma = <%-lista.id%>;
+        let idatividade = <%-atividade%>;
+
+        if(selected){
+            nota = 10;
+            aprovado = 1
+        }else{
+            nota = 0;
+            aprovado = 0
+        }
+		Swal.wait();
+
+		JsonWebApi.post("<%- root %>/api/atividade/registrarTentativa", {
+			idturma,
+            idatividade,
+            nota,
+            aprovado
+		}, function (response) {
+			if (response.success) {
+				Swal.success("Atividade concluída com sucesso! " + emoji.happy);
+			} else {
+				Swal.error(response.value + " " + emoji.sad);
+			}
+		});
+	})})
 
 </script>
 <style>
