@@ -12,7 +12,11 @@
 <script type="text/javascript" src="<%- staticRoot %>/lib/datatables.net-buttons/js/buttons.flash.min.js"></script>
 <script type="text/javascript" src="<%- staticRoot %>/lib/datatables.net-buttons/js/buttons.print.min.js"></script>
 <script type="text/javascript" src="<%- staticRoot %>/lib/datatables.net-select/js/dataTables.select.min.js"></script>
-<script type="text/javascript" src="<%- staticRoot %>/js/datatables-custom.js?20210910"></script>
+<script type="text/javascript" src="<%- staticRoot %>/js/datatables-custom.js?20230118"></script>
+<% } %>
+
+<% if (typeof xlsx !== "undefined" && xlsx) { %>
+<script type="text/javascript" src="<%- staticRoot %>/lib/sheetjs/xlsx.full.min.js"></script>
 <% } %>
 
 <% if (typeof clipboard !== "undefined" && clipboard) { %>
@@ -20,7 +24,7 @@
 <% } %>
 
 <% if (typeof cidades !== "undefined" && cidades) { %>
-<script type="text/javascript" src="<%- staticRoot %>/js/cidades.js"></script>
+<script type="text/javascript" src="<%- staticRoot %>/js/cidades.js?2"></script>
 <% } %>
 
-<script type="text/javascript" charset="utf-8" src="<%- staticRoot %>/js/admin.js?20210910"></script>
+<script type="text/javascript" charset="utf-8" src="<%- staticRoot %>/js/admin.js?20221212"></script>

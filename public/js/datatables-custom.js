@@ -1,6 +1,6 @@
 "use strict";
 
-// 1.0.0
+// 1.0.3
 
 if (window.currentLanguageId === 1) {
 	window.tableLanguage = {
@@ -323,6 +323,88 @@ $.fn.prepareFilters = function (obj) {
 	return filters;
 };
 
+window.prepareColumnPicker = function (dt, parentId, columnPicker) {
+	let ok = false, button = null;
+
+	addFilterButton(parentId, "fa-nomargin fa-columns", null, function () {
+		if (!ok) {
+			const selectId = parentId + "_columnPicker",
+				selectParent = document.createElement("div"),
+				select = document.createElement("select"),
+				colcount = dt.columns().indexes().length,
+				colsettings = dt.settings()[0].aoColumns,
+				options = (typeof columnPicker !== "object") ? {} : columnPicker,
+				validColumns = [],
+				validTitles = [];
+
+			select.setAttribute("id", selectId);
+			selectParent.style.display = "none";
+			selectParent.appendChild(select);
+			_(parentId).appendChild(selectParent);
+
+			let initialSelection = [];
+
+			for (let i = 0; i < colcount; i++) {
+				let th;
+				const title = trim((((th = colsettings[i].nTh) && th.getAttribute("title")) || colsettings[i].sTitle).toString());
+				if (!title || colsettings[i].hideable === false || colsettings[i].hidable === false)
+					continue;
+
+				const option = document.createElement("option");
+				option.setAttribute("value", validColumns.length);
+				option.textContent = title;
+				select.appendChild(option);
+				if (colsettings[i].bVisible)
+					initialSelection.push(validColumns.length);
+				validColumns.push(i);
+				validTitles.push(title);
+			}
+
+			prepareMultiselect(select, {
+				title: (window.currentLanguageId === 1 ? "Select Columns" : "Escolher Colunas"),
+				callback: function (multiselect) {
+					const selection = getMultiselectSelection(multiselect),
+						selectionObj = new Set(),
+						persist = (options.persistId ? {} : null);
+					let empty = true;
+
+					for (let i = selection.length - 1; i >= 0; i--)
+						selectionObj.add(parseInt(selection[i]));
+
+					for (let i = validColumns.length - 1; i >= 0; i--) {
+						const newVisible = selectionObj.has(i),
+							column = dt.column(validColumns[i]);
+
+						if (column.visible() !== newVisible)
+							column.visible(newVisible);
+
+						if (persist && !newVisible) {
+							persist[validColumns[i] + "/" + validTitles[i]] = 1;
+							empty = false;
+						}
+					}
+
+					if (persist) {
+						if (empty)
+							localStorage.removeItem(options.persistId);
+						else
+							localStorage.setItem(options.persistId, JSON.stringify(persist));
+					}
+				}
+			});
+
+			button = document.getElementById(selectId);
+
+			setMultiselectSelection(button, initialSelection);
+			initialSelection = null;
+
+			ok = true;
+		}
+
+		button.click();
+	}).setAttribute("title", (window.currentLanguageId === 1 ? "Select Columns" : "Escolher Colunas"));
+};
+
 window.prepareDataTable = function (id, opt) {
 	var el = _(id), dt, div, o = (opt || {}), f, fullName = "dataTable_PageLength_", removeDom = o.customRemoveDom;
 
@@ -390,6 +472,28 @@ window.prepareDataTable = function (id, opt) {
 	if (removeDom !== "l")
 		o.lengthMenu = [[4, 10, 25, 50, 100, 200, -1], [4, 10, 25, 50, 100, 200, (window.currentLanguageId === 1 ? "All" : "Todos")]];
 
+	if (typeof o.columnPicker === "object" && o.columnPicker.persist) {
+		const persistId = (("localStorage" in window) ? (location.host + location.pathname + "#" + id) : null);
+		if (persistId) {
+			try {
+				o.columnPicker.persistId = persistId;
+				const json = localStorage.getItem(persistId),
+					hiddenColumns = (json ? JSON.parse(json) : null);
+				if (hiddenColumns && typeof hiddenColumns === "object") {
+					for (let i = 0; i < o.columns.length; i++) {
+						if (!o.columns[i].title || o.columns[i].hideable === false || o.columns[i].hidable === false)
+							continue;
+
+						if (hiddenColumns[i + "/" + o.columns[i].title])
+							o.columns[i].visible = false;
+					}
+				}
+			} catch (ex) {
+				// Invalid JSON in localStorage
+			}
+		}
+	}
+
 	dt = $(el).DataTable(o);
 
 	if (removeDom === "f") {
@@ -424,7 +528,22 @@ window.prepareDataTable = function (id, opt) {
 					filters: o.export.filters //[{name:"", value:""},...]
 				});
 			}).setAttribute("title", (window.currentLanguageId === 1 ? "Export CSV" : "Exportar CSV"));
+
+			if (o.export.xlsx) {
+				addFilterButton(id + "_filter", "fa-nomargin fa-file-excel-o fa-file-excel", null, function () {
+					DataTableExporter.exportCSV(dt, {
+						xlsx: o.export.xlsx,
+						xlsxPreHeader: o.export.xlsxPreHeader,
+						title: o.export.title,
+						includeNonSortableColumns: !!o.export.includeNonSortableColumns,
+						filterTitle: o.export.filterTitle,
+						filters: o.export.filters //[{name:"", value:""},...]
+					});
+				}).setAttribute("title", (window.currentLanguageId === 1 ? "Export XLSX" : "Exportar XLSX"));
+			}
 		}
+		if (o.columnPicker)
+			prepareColumnPicker(dt, id + "_filter", o.columnPicker);
 	}
 	if (removeDom !== "l" && window.localStorage) {
 		f = _(id + "_length");
@@ -468,10 +587,10 @@ window.DataTableExporter = {
 		config.regex2 = /\r\n|\r|\n/g;
 		config.regex3 = /^\s+|\s+$/g;
 
-		config.title = (config.title || (window.currentLanguageId === 1 ? "Data" : "Dados")).replace(config.regex1, "").replace(config.regex2, " ").replace(config.regex3, "");
+		config.title = (config.title || (window.currentLanguageId === 1 ? "Data" : "Dados")).toString().replace(config.regex1, "").replace(config.regex3, "");
 
 		if (!config.filename)
-			config.filename = config.title;
+			config.filename = config.title.replace(config.regex2, " ");
 
 		config.filename = config.filename.replace(/[^a-zA-Z0-9_\u00A1-\uFFFF\.,\-_ !\(\)]/g, "");
 
@@ -493,9 +612,10 @@ window.DataTableExporter = {
 
 		DataTableExporter.normalizeConfig(config, ".csv");
 
-		config.regexSemicolon = /;/g;
+		config.regexQuote = /\"/g;
 
 		var i, c, v, blobdata, b = 0, colhdr = [], colidx = [], colDataSrc, colDataIdx = [], colDataIsFunction = [], colDataMustUseEval = [], th, colcount = dt.columns().indexes().length, rownodes, rowcount = dt.rows().count(), rowarray, filterCount = (!config.filters ? 0 : config.filters.length), colsettings = dt.settings()[0].aoColumns, tmpDiv = document.createElement("div"),
+			xlsx = !!config.xlsx, rowdata,	
 			today = new Date(), fmt2 = function (x) {
 				return (x < 10 ? ("0" + x) : x);
 			};
@@ -511,7 +631,7 @@ window.DataTableExporter = {
 				continue;
 
 			tmpDiv.innerHTML = (((th = colsettings[i].nTh) && th.getAttribute("title")) || colsettings[i].sTitle).toString();
-			colhdr.push(tmpDiv.textContent.replace(config.regex1, "").replace(config.regex2, " ").replace(config.regex3, "").replace(config.regexSemicolon, ","));
+			colhdr.push(tmpDiv.textContent.replace(config.regex1, "").replace(config.regex3, ""));
 			colidx.push(i);
 			colDataSrc = colsettings[i].mData;
 			if (colDataSrc._) colDataSrc = colDataSrc._;
@@ -525,71 +645,134 @@ window.DataTableExporter = {
 		if (!colcount || !rowcount)
 			return DataTableExporter.alertNothingToExport();
 
-		// Let's count how many elements the finall array will have, therefore, creating the entire array at once
-		blobdata = new Array(
+		// Let's count how many elements the final array will have, therefore, creating the entire array at once
+		blobdata = xlsx ? [] : new Array(
 			1 + // UTF-8 BOM
-			4 + // Title + ; + Date + \n
+			5 + // " + Title + ";" + Date + "\n
 			1 + // \n
 			(filterCount ?
-				3 + (filterCount * 4) + 1 : // Filtros + \n + \n + (Filtro: + ; + Valor + \n) para cada filtro + \n
+				4 + (filterCount * 5) + 1 : // " + Filtros + "\n + \n + (" + Filtro + ";" + Valor + "\n) para cada filtro + \n
 				0
 			) +
-			(colcount * 2) + // Title + ; or Title + \n (for each cell in the header)
-			(rowcount * colcount * 2) // Value + ; or Value + \n (for each cell in the table)
+			(colcount * 2) + 1 + // (" + Title or ";" + Title) + "\n (for each cell in the header)
+			(rowcount * ((colcount * 2) + 1)) // (" + Value or ";" + Value) (for each cell in the table) + "\n (for each row)
 		);
 
-		blobdata[b++] = new Uint8Array([0xEF, 0xBB, 0xBF]); // UTF-8 BOM
+		if (!xlsx) {
+			blobdata[b++] = new Uint8Array([0xEF, 0xBB, 0xBF]); // UTF-8 BOM
 
-		blobdata[b++] = config.title.replace(config.regexSemicolon, ",");
-		blobdata[b++] = ";";
-		blobdata[b++] = fmt2(today.getDate()) + "/" + fmt2(today.getMonth() + 1) + "/" + today.getFullYear() + " " + fmt2(today.getHours()) + ":" + fmt2(today.getMinutes());
-		blobdata[b++] = "\n";
+			blobdata[b++] = "\"";
+			blobdata[b++] = config.title.replace(config.regexQuote, "\"\"");
+			blobdata[b++] = "\";\"";
+			blobdata[b++] = fmt2(today.getDate()) + "/" + fmt2(today.getMonth() + 1) + "/" + today.getFullYear() + " " + fmt2(today.getHours()) + ":" + fmt2(today.getMinutes());
+			blobdata[b++] = "\"\n";
 
-		blobdata[b++] = "\n";
-
-		if (filterCount) {
-			blobdata[b++] = config.filterTitle;
-			blobdata[b++] = "\n";
 			blobdata[b++] = "\n";
 
-			for (i = 0; i < filterCount; i++) {
-				blobdata[b++] = config.filters[i].name.replace(config.regex1, "").replace(config.regex2, " ").replace(config.regex3, "").replace(config.regexSemicolon, ",");
-				blobdata[b++] = ";";
-				blobdata[b++] = config.filters[i].value.replace(config.regex1, "").replace(config.regex2, " ").replace(config.regex3, "").replace(config.regexSemicolon, ",");
+			if (filterCount) {
+				blobdata[b++] = "\"";
+				blobdata[b++] = (config.filterTitle || (window.currentLanguageId === 1 ? "Filters" : "Filtros")).toString().replace(config.regex1, "").replace(config.regex3, "").replace(config.regexQuote, "\"\"");
+				blobdata[b++] = "\"\n";
+				blobdata[b++] = "\n";
+
+				for (i = 0; i < filterCount; i++) {
+					blobdata[b++] = "\"";
+					blobdata[b++] = (config.filters[i].name || "").toString().replace(config.regex1, "").replace(config.regex3, "").replace(config.regexQuote, "\"\"");
+					blobdata[b++] = "\";\"";
+					blobdata[b++] = (config.filters[i].value || "").toString().replace(config.regex1, "").replace(config.regex3, "").replace(config.regexQuote, "\"\"");
+					blobdata[b++] = "\"\n";
+				}
+
 				blobdata[b++] = "\n";
 			}
 
-			blobdata[b++] = "\n";
-		}
+			for (i = 0; i < colcount; i++) {
+				blobdata[b++] = (i ? "\";\"" : "\"");
+				blobdata[b++] = colhdr[i].replace(config.regexQuote, "\"\"");
+			}
+			blobdata[b++] = "\"\n";
 
-		for (i = 0; i < colcount; i++) {
-			if (i)
-				blobdata[b++] = ";";
-			blobdata[b++] = colhdr[i];
-		}
-		blobdata[b++] = "\n";
+			rownodes = dt.rows({ order: "current" }).data();
 
-		rownodes = dt.rows({ order: "current" }).data();
+			for (i = 0; i < rowcount; i++) {
+				rowarray = rownodes[i];
+				for (c = 0; c < colcount; c++) {
+					blobdata[b++] = (c ? "\";\"" : "\"");
+					if (colsettings[colidx[c]].mRender) {
+						// If we are rendering using encode, ignore regex1
+						v = (colDataIsFunction[c] ? colDataIdx[c](rowarray) : (colDataMustUseEval[c] ? eval("rowarray." + colDataIdx[c]) : rowarray[colDataIdx[c]]));
+						blobdata[b++] = (v === null ? "" : v).toString().replace(config.regex3, "").replace(config.regexQuote, "\"\"");
+					} else {
+						// Otherwise, remove the tags and replace the rest
+						v = (colDataIsFunction[c] ? colDataIdx[c](rowarray) : (colDataMustUseEval[c] ? eval("rowarray." + colDataIdx[c]) : rowarray[colDataIdx[c]]));
+						tmpDiv.innerHTML = (v === null ? "" : v).toString().replace(config.regex1, "").replace(config.regex3, "");
+						blobdata[b++] = tmpDiv.textContent.replace(config.regexQuote, "\"\"");
+					}
+				}
+				blobdata[b++] = "\"\n";
+			}
 
-		for (i = 0; i < rowcount; i++) {
-			rowarray = rownodes[i];
-			for (c = 0; c < colcount; c++) {
-				if (c)
-					blobdata[b++] = ";";
-				if (colsettings[colidx[c]].mRender) {
-					// If we are rendering using encode, ignore regex1
-					v = (colDataIsFunction[c] ? colDataIdx[c](rowarray) : (colDataMustUseEval[c] ? eval("rowarray." + colDataIdx[c]) : rowarray[colDataIdx[c]]));
-					blobdata[b++] = (v === null ? "" : v).toString().replace(config.regex2, " ").replace(config.regex3, "").replace(config.regexSemicolon, ",");
-				} else {
-					// Otherwise, remove the tags and replace the rest
-					v = (colDataIsFunction[c] ? colDataIdx[c](rowarray) : (colDataMustUseEval[c] ? eval("rowarray." + colDataIdx[c]) : rowarray[colDataIdx[c]]));
-					tmpDiv.innerHTML = (v === null ? "" : v).toString().replace(config.regex1, "").replace(config.regex2, " ").replace(config.regex3, "");
-					blobdata[b++] = tmpDiv.textContent.replace(config.regexSemicolon, ",");
+			BlobDownloader.download(config.filename, new Blob(blobdata, { type: "text/csv;charset=utf-8" }));
+		} else {
+			if (config.xlsxPreHeader) {
+				rowdata = [
+					config.title,
+					fmt2(today.getDate()) + "/" + fmt2(today.getMonth() + 1) + "/" + today.getFullYear() + " " + fmt2(today.getHours()) + ":" + fmt2(today.getMinutes())
+				];
+				blobdata.push(rowdata);
+
+				blobdata.push([]);
+
+				if (filterCount) {
+					rowdata = [
+						config.filterTitle || (window.currentLanguageId === 1 ? "Filters" : "Filtros")
+					];
+					blobdata.push(rowdata);
+
+					blobdata.push([]);
+
+					for (i = 0; i < filterCount; i++) {
+						rowdata = [
+							config.filters[i].name,
+							config.filters[i].value
+						];
+						blobdata.push(rowdata);
+					}
+
+					blobdata.push([]);
 				}
 			}
-			blobdata[b++] = "\n";
-		}
 
-		BlobDownloader.download(config.filename, new Blob(blobdata, { type: "text/csv;charset=utf-8" }));
+			rowdata = [];
+			for (i = 0; i < colcount; i++)
+				rowdata.push(colhdr[i]);
+			blobdata.push(rowdata);
+
+			rownodes = dt.rows({ order: "current" }).data();
+
+			for (i = 0; i < rowcount; i++) {
+				rowdata = [];
+				rowarray = rownodes[i];
+				for (c = 0; c < colcount; c++) {
+					if (colsettings[colidx[c]].mRender) {
+						// If we are rendering using encode, ignore regex1
+						v = (colDataIsFunction[c] ? colDataIdx[c](rowarray) : (colDataMustUseEval[c] ? eval("rowarray." + colDataIdx[c]) : rowarray[colDataIdx[c]]));
+						rowdata.push((v === null ? "" : v).toString());
+					} else {
+						// Otherwise, remove the tags and replace the rest
+						v = (colDataIsFunction[c] ? colDataIdx[c](rowarray) : (colDataMustUseEval[c] ? eval("rowarray." + colDataIdx[c]) : rowarray[colDataIdx[c]]));
+						tmpDiv.innerHTML = (v === null ? "" : v).toString();
+						rowdata.push(tmpDiv.textContent);
+					}
+				}
+				blobdata.push(rowdata);
+			}
+
+			const filename = config.filename.replace(".csv", "");
+			const worksheet = XLSX.utils.aoa_to_sheet(blobdata);
+			const workbook = XLSX.utils.book_new();
+			XLSX.utils.book_append_sheet(workbook, worksheet, filename);
+			XLSX.writeFile(workbook, filename + ".xlsx", { compression: false });
+		}
 	}
 };

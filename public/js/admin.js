@@ -1,12 +1,16 @@
 "use strict";
 (function () {
-	var sidebarCollapseHidden = false,
-		sidebarSmall = false,
-		sidebarShouldBeSmall = false,
+	var initiallyCollapsed = false,
+		sidebarCollapseHidden = initiallyCollapsed,
+		sidebarSmall = initiallyCollapsed,
+		sidebarShouldBeSmall = initiallyCollapsed,
 		sidebarForcedVisible = false,
 		$body = $(document.body),
 		$sidebar = $(".sidebar"),
 		$sidebarcollapse = $(".sidebar .collapse");
+
+	if (initiallyCollapsed)
+		$body.addClass("sidebar-toggled");
 
 	function makeSidebarSmall() {
 		sidebarSmall = true;

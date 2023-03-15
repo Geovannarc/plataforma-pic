@@ -5,27 +5,63 @@ import Turma = require("../models/turma");
 import Usuario = require("../models/usuario");
 
 class IndexRoute {
+	@app.http.hidden()
+	private static async obterAnos(req: app.Request, res: app.Response, usuario: Usuario): Promise<{ ano: number, anos: number[] } | null> {
+		const anos = await Turma.anosPorUsuario(usuario.id);
+		if (!anos || !anos.length) {
+			res.render("index/erro", { layout: "layout-externo", mensagem: "Não foram encontradas atribuições do usuário a turmas" });
+			return null;
+		}
+
+		let ano = parseInt(req.query["ano"] as string) || (new Date()).getFullYear();
+		let encontrado = false;
+		for (let i = anos.length - 1; i >= 0; i--) {
+			if (anos[i] === ano) {
+				encontrado = true;
+				break;
+			}
+		}
+		if (!encontrado)
+			ano = anos[anos.length - 1];
+
+		return {
+			ano,
+			anos
+		};
+	}
+
 	public static async index(req: app.Request, res: app.Response) {
 		let u = await Usuario.cookie(req);
-		if (!u)
+		if (!u) {
 			res.redirect(app.root + "/login");
-		else
-		if(u.idperfil == Perfil.Professor || u.idperfil == Perfil.Administrador){
-			res.render("index/index", {
-				layout: "layout-sem-form",
-				titulo: "Dashboard",
-				usuario: u,
-				lista: await Turma.situacaoPorProfessor((new Date()).getFullYear(), u.id)
-			});
-		}else{
-			const ano = (new Date()).getFullYear();
-			res.render("index/menu", {
-				layout: "layout-externo-sem-card",
-				usuario: u,
-				situacao: await Turma.situacaoPorAlunoPorCapitulo(ano, u.id),
-				atividades: await Turma.notasAluno(ano, u.id),
-				liberadas: await Turma.liberadasPorTurma(ano, u.id)
-			});
+		} else {
+			const anos = await IndexRoute.obterAnos(req, res, u);
+			if (!anos)
+				return;
+
+			if (u.idperfil == Perfil.Professor || u.idperfil == Perfil.Administrador) {
+				res.render("index/index", {
+					layout: "layout-sem-form",
+					titulo: "Dashboard",
+					usuario: u,
+					ano: anos.ano,
+					anos: anos.anos,
+					lista: await Turma.situacaoPorProfessor(anos.ano, u.id)
+				});
+			} else {
+				const situacao = await Turma.situacaoPorAlunoPorCapitulo(anos.ano, u.id);
+				if (!situacao) {
+					res.render("index/erro", { layout: "layout-externo", mensagem: "Não foi encontrada uma matrícula em uma turma no ano de " + anos.ano });
+				} else {
+					res.render("index/menu", {
+						layout: "layout-externo-sem-card",
+						usuario: u,
+						situacao,
+						atividades: await Turma.notasAluno(anos.ano, u.id),
+						liberadas: await Turma.liberadasPorTurma(anos.ano, u.id)
+					});
+				}
+			}
 		}
 	}
 
@@ -43,20 +79,31 @@ class IndexRoute {
 
 	public static async notas(req: app.Request, res: app.Response) {
 		let u = await Usuario.cookie(req);
-		if (!u)
+		if (!u) {
 			res.redirect(app.root + "/acesso");
-		else{
-			if(u.idperfil == Perfil.Aluno){
-				const ano = (new Date()).getFullYear();
-				res.render("index/notas", {
-					layout: "layout-sem-form",
-					titulo: "Notas",
-					datatables: true,
-					usuario: u,
-					notas: await Turma.notasAluno(ano, u.id),
-					situacao: await Turma.situacaoPorAluno(ano, u.id)
-				});
-			}else{
+		} else {
+			const anos = await IndexRoute.obterAnos(req, res, u);
+			if (!anos)
+				return;
+
+			if (u.idperfil == Perfil.Aluno) {
+				const situacao = await Turma.situacaoPorAluno(anos.ano, u.id);
+				if (!situacao) {
+					res.render("index/erro", { layout: "layout-externo", mensagem: "Não foi encontrada uma matrícula em uma turma no ano de " + anos.ano });
+				} else {
+					res.render("index/notas", {
+						layout: "layout-sem-form",
+						titulo: "Notas",
+						datatables: true,
+						xlsx: true,
+						usuario: u,
+						ano: anos.ano,
+						anos: anos.anos,
+						notas: await Turma.notasAluno(anos.ano, u.id),
+						situacao
+					});
+				}
+			} else {
 				// @@@ relatório de notas do professor
 				res.render("index/erro", { layout: "layout-externo", mensagem: "Não implementado", erro: "Não implementado" });
 			}

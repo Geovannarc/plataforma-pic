@@ -505,7 +505,7 @@ class Turma {
 
 	public static async notasAluno(ano: number, idaluno: number): Promise<SituacaoAtividadesAluno[]>{
 		return app.sql.connect(async (sql) => {
-			const situacao:SituacaoAtividadesAluno[] = await sql.query(`select turma.nome turma, atividade.nome atividade, atividade.capitulo, atividade.idsecao, turma_usuario_atividade.aprovado, turma_usuario_atividade.conclusao
+			const situacao:SituacaoAtividadesAluno[] = await sql.query(`select turma.nome turma, atividade.nome atividade, atividade.capitulo, atividade.idsecao, turma_usuario_atividade.aprovado, date_format(turma_usuario_atividade.conclusao, '%d/%m/%Y %H:%i') conclusao
 			from
 			turma_usuario
 			inner join
@@ -613,6 +613,21 @@ class Turma {
         }
         return null;
     }
+
+	public static async anosPorUsuario(idusuario: number): Promise<number[]> {
+		return app.sql.connect(async (sql) => {
+			const lista = await sql.query("select distinct t.ano from turma_usuario ta inner join turma t on t.id = ta.idturma where ta.idusuario = ? order by t.ano asc", [idusuario]) as { ano: number }[];
+
+			if (!lista || !lista.length)
+				return [];
+
+			const anos: number[] = new Array(lista.length);
+			for (let i = lista.length - 1; i >= 0; i--)
+				anos[i] = lista[i].ano;
+
+			return anos;
+		});
+	}
 };
 
 export = Turma;

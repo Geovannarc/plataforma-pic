@@ -893,6 +893,9 @@ window.intToColor = function (i) {
 	return "#" + s.substr(s.length - 6);
 };
 window.relativeLuminance = function (rgb) {
+	if ((typeof rgb) === "string")
+		rgb = parseInt(rgb.replace("#", ""), 16);
+	rgb |= 0;
 	if (rgb < 0)
 		return 1;
 	//http://www.w3.org/TR/2007/WD-WCAG20-TECHS-20070517/Overview.html#G18
@@ -906,7 +909,7 @@ window.relativeLuminance = function (rgb) {
 	return (0.2126 * R) + (0.7152 * G) + (0.0722 * B);
 };
 window.textColorForBackground = function (i) {
-	return (relativeLuminance(i) < 0.4 ? "#fff" : "#000");
+	return (relativeLuminance(i) < 0.4) ? "#ffffff" : "#000000";
 };
 window.fixUrlOnBlur = function (input) {
 	var i = _(input);
@@ -1421,7 +1424,7 @@ window.BlobDownloader = {
 };
 // Search for selects
 (function () {
-	var regSlash = /[\/\\]/g, regTrim = /^\s+|\s+$/g, regA = /[ÁÀÃÂÄ]/g, regE = /[ÉÈÊË]/g, regI = /[ÍÌÎ]/g, regO = /[ÓÒÕÔ]/g, regU = /[ÚÙÛ]/g, regC = /[Ç]/g;
+	var regSlash = /[\/\\]/g, regTrim = /^\s+|\s+$/g, regA = /[ÁÀÃÂÄ]/g, regE = /[ÉÈÊË]/g, regI = /[ÍÌÎÏ]/g, regO = /[ÓÒÕÔÖ]/g, regU = /[ÚÙÛÜ]/g, regY = /[ÝŸ]/g, regC = /[Ç]/g;
 
 	function cbSearch_SetValue(select, value) {
 		select.value = value;
@@ -1442,11 +1445,11 @@ window.BlobDownloader = {
 	}
 
 	function cbSearch_Normalize(x) {
-		return x.toUpperCase().replace(regSlash, " ").replace(regTrim, "").replace(regA, "A").replace(regE, "E").replace(regI, "I").replace(regO, "O").replace(regU, "U").replace(regC, "C");
+		return x.toUpperCase().replace(regSlash, " ").replace(regTrim, "").replace(regA, "A").replace(regE, "E").replace(regI, "I").replace(regO, "O").replace(regU, "U").replace(regY, "Y").replace(regC, "C");
 	}
 
 	window.normalizeAccent = function (x) {
-		return (x ? x.toUpperCase().replace(regTrim, "").replace(regA, "A").replace(regE, "E").replace(regI, "I").replace(regO, "O").replace(regU, "U").replace(regC, "C") : "");
+		return (x ? x.toUpperCase().replace(regTrim, "").replace(regA, "A").replace(regE, "E").replace(regI, "I").replace(regO, "O").replace(regU, "U").replace(regY, "Y").replace(regC, "C") : "");
 	};
 
 	function cbSearch_Change() {
@@ -1894,7 +1897,7 @@ window.BlobDownloader = {
 		button.setAttribute("aria-label", "Pesquisar");
 		button.setAttribute("tabindex", "-1");
 		button.cbSearchSelect = select;
-		i.className = "fa fa-nomargin fa-filter";
+		i.className = "fa fa-nomargin fa-search";
 		if (window.prepareCbSearchAllowLower)
 			input.className = "form-control select-arrow" + ((select.className.indexOf("upper") >= 0) ? " upper" : "");
 		else
@@ -1956,8 +1959,8 @@ window.BlobDownloader = {
 
 		select.addEventListener("change", function () {
 			var i, nextValue = emptyValue, opt, opts = optsCallback(select.options.selectedIndex, select.value);
-			while (nextSelect.childNodes.length > 1)
-				nextSelect.removeChild(nextSelect.childNodes[1]);
+			while (nextSelect.children.length > 1)
+				nextSelect.removeChild(nextSelect.children[1]);
 			if (opts && opts.length) {
 				for (i = 0; i < opts.length; i++) {
 					opt = document.createElement("option");
@@ -2253,6 +2256,61 @@ window.DataUtil = {
 		const hoje = DataUtil.dateUTC(deltaSegundos);
 
 		return DataUtil.formatarBrComHorario(hoje.getFullYear(), hoje.getMonth() + 1, hoje.getDate(), hoje.getHours(), hoje.getMinutes(), hoje.getSeconds());
+	},
+
+	inicioDoMesComoDateUTC: function (ano, mes) {
+		if (!ano || !mes) {
+			const agora = new Date();
+			if (!ano)
+				ano = agora.getFullYear();
+			if (!mes)
+				mes = agora.getMonth() + 1;
+		}
+
+		return new Date(Date.UTC(ano, mes - 1, 1));
+	},
+
+	fimDoMesComoDateUTC: function (ano, mes) {
+		if (!ano || !mes) {
+			const agora = new Date();
+			if (!ano)
+				ano = agora.getFullYear();
+			if (!mes)
+				mes = agora.getMonth() + 1;
+		}
+
+		if (mes === 12) {
+			mes = 1;
+			ano++;
+		} else {
+			mes++;
+		}
+
+		return new Date(Date.UTC(ano, mes - 1, 1) - (24 * 60 * 60 * 1000));
+	},
+
+	inicioDoMesISO: function (ano, mes) {
+		const inicioDoMes = DataUtil.inicioDoMesComoDateUTC(ano, mes);
+
+		return DataUtil.formatar(inicioDoMes.getUTCFullYear(), inicioDoMes.getUTCMonth() + 1, inicioDoMes.getUTCDate());
+	},
+
+	fimDoMesISO: function (ano, mes) {
+		const fimDoMes = DataUtil.fimDoMesComoDateUTC(ano, mes);
+
+		return DataUtil.formatar(fimDoMes.getUTCFullYear(), fimDoMes.getUTCMonth() + 1, fimDoMes.getUTCDate());
+	},
+
+	inicioDoMesBr: function (ano, mes) {
+		const inicioDoMes = DataUtil.inicioDoMesComoDateUTC(ano, mes);
+
+		return DataUtil.formatarBr(inicioDoMes.getUTCFullYear(), inicioDoMes.getUTCMonth() + 1, inicioDoMes.getUTCDate());
+	},
+
+	fimDoMesBr: function (ano, mes) {
+		const fimDoMes = DataUtil.fimDoMesComoDateUTC(ano, mes);
+
+		return DataUtil.formatarBr(fimDoMes.getUTCFullYear(), fimDoMes.getUTCMonth() + 1, fimDoMes.getUTCDate());
 	}
 };
 window.prepareDatePicker = function (id, options) {
@@ -2308,7 +2366,8 @@ window.prepareMultiselect = function (id, options) {
 		btn.setAttribute("id", select.getAttribute("id"));
 		btn.setAttribute("type", "button");
 		btn.className = (options && options.className) || "btn btn-primary btn-block";
-		btn.textContent = "Seleção: Nada";
+		btn.setAttribute("data-label", (options && options.label) || "Seleção");
+		btn.textContent = btn.getAttribute("data-label") + ": Nada";
 
 		if (select.parentNode)
 			select.parentNode.replaceChild(btn, select);
@@ -2316,10 +2375,11 @@ window.prepareMultiselect = function (id, options) {
 		for (let i = opts.length - 1; i >= 0; i--)
 			items[i] = {
 				id: opts[i].getAttribute("value"),
-				text: opts[i].textContent
+				text: opts[i].textContent,
+				backgroundColor: opts[i].style.backgroundColor,
+				color: opts[i].style.color
 			};
 
-		
 		opts = null;
 		items = null;
 
@@ -2333,8 +2393,11 @@ window.prepareMultiselect = function (id, options) {
 			let tempSelection = {}, tempSelectionCount = btn.selectionCount,
 				html = '<div class="row mb-3"><div class="col"><input type="text" spellcheck="off" class="form-control form-control-sm" placeholder="Filtro"/></div><div class="col"><button type="button" class="btn btn-secondary btn-sm btn-block">Alternar Tudo</button></div></div>';
 
-			for (let i = 0; i < items.length; i++)
-				html += '<button type="button" class="btn btn-sm mb-0 ' + (i ? "mt-1" : "mt-0") + ' btn-block ' + (selection[items[i].id] ? 'btn-primary' : 'btn-light') + '" data-ntext="' + encodeValue(normalizeAccent(items[i].text)) + '" data-id="' + encodeValue(items[i].id) + '">' + encode(items[i].text) + '</button>';
+			for (let i = 0; i < items.length; i++) {
+				const idStr = items[i].id.toString();
+				const textStr = (items[i].text || "").toString();
+				html += '<button type="button" class="btn btn-sm mb-0 ' + (i ? "mt-1" : "mt-0") + ' btn-block ' + (selection[idStr] ? 'btn-primary' : 'btn-light') + '" data-ntext="' + encodeValue(normalizeAccent(textStr)) + '" data-id="' + encodeValue(idStr) + '">' + ((items[i].color || items[i].backgroundColor) ? ('<span class="badge" style="font-size: 1em;' + (items[i].color ? ("color:" + items[i].color + ";") : "") + (items[i].backgroundColor ? ("background-color:" + items[i].backgroundColor + ";") : "") + '">' + encode(textStr) + '</span> ') : encode(textStr)) + '</button>';
+			}
 
 			for (let i in selection)
 				tempSelection[i] = true;
@@ -2392,7 +2455,9 @@ window.prepareMultiselect = function (id, options) {
 				preConfirm: function () {
 					btn.selection = tempSelection;
 					btn.selectionCount = tempSelectionCount;
-					btn.textContent = "Seleção: " + (!tempSelectionCount ? "Nada" : (tempSelectionCount === btn.selectionItems.length ? "Tudo" : (tempSelectionCount === 1 ? "1 item" : (tempSelectionCount + " itens"))));
+					btn.textContent = btn.getAttribute("data-label") + ": " + (!tempSelectionCount ? "Nada" : (tempSelectionCount === btn.selectionItems.length ? "Tudo" : (tempSelectionCount === 1 ? "1 item" : (tempSelectionCount + " itens"))));
+					if (options && options.callback)
+						options.callback(btn);
 					return true;
 				}
 			});
@@ -2457,7 +2522,7 @@ window.setMultiselectSelection = function (id, values) {
 
 		i$.selection = tempSelection;
 		i$.selectionCount = tempSelectionCount;
-		i$.textContent = "Seleção: " + (!tempSelectionCount ? "Nada" : (tempSelectionCount === i$.selectionItems.length ? "Tudo" : (tempSelectionCount === 1 ? "1 item" : (tempSelectionCount + " itens"))));
+		i$.textContent = i$.getAttribute("data-label") + ": " + (!tempSelectionCount ? "Nada" : (tempSelectionCount === i$.selectionItems.length ? "Tudo" : (tempSelectionCount === 1 ? "1 item" : (tempSelectionCount + " itens"))));
 	}
 };
 

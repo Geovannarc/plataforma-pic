@@ -9,6 +9,24 @@ let cores = [
 	"dark"
 ];
 %>
+
+<div class="row">
+	<div class="col-lg-3 col-md-4 col-sm-6">
+		<div class="form-group">
+			<h3><label for="anoMatricula" class="mb-0">Matrícula</label></h3>
+			<select class="form-control" id="anoMatricula" onchange="Swal.wait(); window.location.href = '<%- root %>/notas?ano=' + $('#anoMatricula').val();">
+<%
+	for (let i = 0; i < anos.length; i++) {
+%>
+				<option value="<%- anos[i] %>" <%- ((ano === anos[i]) ? 'selected="selected"' : '') %>><%- anos[i] %></option>
+<%
+	}
+%>
+			</select>
+		</div>
+	</div>
+</div>
+
 <div class="row">
 
 	<div class="col-xl-3 col-md-6 mb-4">
@@ -158,13 +176,12 @@ let cores = [
 				deferRender: true,
 				columns: [
 					{ title: "Atividade", render: encode, data: "atividade" },
-					{ title: "Capítulo", data: "capitulo" },
 					{ title: "Seção", data: "idsecao" },
 					{ title: "Aprovado", render: encode, data: function (row) { return row.aprovado ? "Sim" : "Não"; }},
-					{ title: "Conclusão", "class": "col-min text-right", "type": "customdateint", data: "conclusao" }
+					{ title: "Conclusão", "class": "col-min text-right", "type": "customdatetimeint", data: "conclusao" }
 				],
 				data: notas,
-				export: { title: "Notas do Capítulo " + capitulo }
+				export: { xlsx: true, title: "Atividades - Capítulo " + capitulo }
 			});
 		}
 	}

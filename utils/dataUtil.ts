@@ -204,4 +204,59 @@ export = class DataUtil {
 
 		return DataUtil.formatarBrComHorario(hoje.getFullYear(), hoje.getMonth() + 1, hoje.getDate(), hoje.getHours(), hoje.getMinutes(), hoje.getSeconds());
 	}
+
+	public static inicioDoMesComoDateUTC(ano?: number, mes?: number): Date {
+		if (!ano || !mes) {
+			const agora = new Date();
+			if (!ano)
+				ano = agora.getFullYear();
+			if (!mes)
+				mes = agora.getMonth() + 1;
+		}
+
+		return new Date(Date.UTC(ano, mes - 1, 1));
+	}
+
+	public static fimDoMesComoDateUTC(ano?: number, mes?: number): Date {
+		if (!ano || !mes) {
+			const agora = new Date();
+			if (!ano)
+				ano = agora.getFullYear();
+			if (!mes)
+				mes = agora.getMonth() + 1;
+		}
+
+		if (mes === 12) {
+			mes = 1;
+			ano++;
+		} else {
+			mes++;
+		}
+
+		return new Date(Date.UTC(ano, mes - 1, 1) - (24 * 60 * 60 * 1000));
+	}
+
+	public static inicioDoMesISO(ano?: number, mes?: number): string {
+		const inicioDoMes = DataUtil.inicioDoMesComoDateUTC(ano, mes);
+
+		return DataUtil.formatar(inicioDoMes.getUTCFullYear(), inicioDoMes.getUTCMonth() + 1, inicioDoMes.getUTCDate());
+	}
+
+	public static fimDoMesISO(ano?: number, mes?: number): string {
+		const fimDoMes = DataUtil.fimDoMesComoDateUTC(ano, mes);
+
+		return DataUtil.formatar(fimDoMes.getUTCFullYear(), fimDoMes.getUTCMonth() + 1, fimDoMes.getUTCDate());
+	}
+
+	public static inicioDoMesBr(ano?: number, mes?: number): string {
+		const inicioDoMes = DataUtil.inicioDoMesComoDateUTC(ano, mes);
+
+		return DataUtil.formatarBr(inicioDoMes.getUTCFullYear(), inicioDoMes.getUTCMonth() + 1, inicioDoMes.getUTCDate());
+	}
+
+	public static fimDoMesBr(ano?: number, mes?: number): string {
+		const fimDoMes = DataUtil.fimDoMesComoDateUTC(ano, mes);
+
+		return DataUtil.formatarBr(fimDoMes.getUTCFullYear(), fimDoMes.getUTCMonth() + 1, fimDoMes.getUTCDate());
+	}
 };
