@@ -132,10 +132,9 @@ class Turma {
 		});
 	}
 
-	public static listarDeUsuario(idusuario: number): Promise<Turma[]> {
+	public static listarDeUsuario(ano: number, idusuario: number): Promise<Turma[]> {
 		return app.sql.connect(async (sql) => {
-			// @@@
-			return (await sql.query("select d.id, d.ano, d.serie, d.nome, d.sala, du.professor, date_format(d.criacao, '%d/%m/%Y') criacao from turma_usuario du inner join turma d on d.id = du.idturma where du.idusuario = ? and d.exclusao is null order by d.ano desc, d.nome asc", [idusuario])) || [];
+			return (await sql.query("select d.id, d.ano, d.serie, d.nome, d.sala, du.professor, date_format(d.criacao, '%d/%m/%Y') criacao from turma_usuario du inner join turma d on d.id = du.idturma where du.idusuario = ? and d.ano = ? and d.exclusao is null order by d.ano desc, d.nome asc", [idusuario, ano])) || [];
 		});
 	}
 
@@ -627,6 +626,30 @@ class Turma {
 
 			return anos;
 		});
+	}
+
+	public static async anosTratadosPorUsuario(req: app.Request, res: app.Response, idusuario: number): Promise<{ ano: number, lista: number[] } | null> {
+		const anos = await Turma.anosPorUsuario(idusuario);
+		if (!anos || !anos.length) {
+			res.render("index/erro", { layout: "layout-externo", mensagem: "Não foram encontradas atribuições do usuário a turmas" });
+			return null;
+		}
+
+		let ano = parseInt(req.query["ano"] as string) || (new Date()).getFullYear();
+		let encontrado = false;
+		for (let i = anos.length - 1; i >= 0; i--) {
+			if (anos[i] === ano) {
+				encontrado = true;
+				break;
+			}
+		}
+		if (!encontrado)
+			ano = anos[anos.length - 1];
+
+		return {
+			ano,
+			lista: anos
+		};
 	}
 };
 

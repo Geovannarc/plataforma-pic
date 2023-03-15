@@ -10,6 +10,23 @@
 	];
 %>
 
+<div class="row">
+	<div class="col-lg-3 col-md-4 col-sm-6">
+		<div class="form-group">
+			<h3><label for="anoMatricula" class="mb-0">Ano</label></h3>
+			<select class="form-control" id="anoMatricula" onchange="Swal.wait(); window.location.href = '<%- root %>/turma/?ano=' + $('#anoMatricula').val();">
+<%
+	for (let i = 0; i < anos.length; i++) {
+%>
+				<option value="<%- anos[i] %>" <%- ((ano === anos[i]) ? 'selected="selected"' : '') %>><%- anos[i] %></option>
+<%
+	}
+%>
+			</select>
+		</div>
+	</div>
+</div>
+
 <% if (!lista.length) { %>
 <p class="text-center">Você ainda não tem turmas atribuídas. 😢</p>
 <% } else { %>

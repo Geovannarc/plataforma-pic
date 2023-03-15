@@ -48,13 +48,6 @@ class Atividade {
 		})
 	}
 
-	public static listarDeatividade(id: number): Promise<Atividade[]> {
-		return app.sql.connect(async (sql) => {
-			// @@@
-			return (await sql.query("select id, nome, idsecao from atividade where id = ?", [id])) || [];
-		});
-	}
-
 	public static async listar(): Promise<any[]> {
 		return app.sql.connect(async (sql) => {
 			return (await sql.query("select a.id, a.nome, l.nome nomelivro, a.idsecao, s.nome nomesecao, a.capitulo from atividade a inner join livro l on l.id = a.idlivro inner join secao s on s.id = a.idsecao")) || [];

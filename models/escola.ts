@@ -13,13 +13,6 @@ interface Escola {
 
 class Escola {
 
-	public static listarDeEscola(id: number): Promise<Escola[]> {
-		return app.sql.connect(async (sql) => {
-			// @@@
-			return (await sql.query("select id, nome, email, contato, criacao from escola where id = ? and exclusao is null order by criacao desc;", [id])) || [];
-		});
-	}
-
 	private static validar(escola: Escola): string {
 		if (!escola)
 			return "Dados inválidos";

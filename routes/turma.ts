@@ -84,16 +84,23 @@ class TurmaRoute {
 
 	public static async index(req: app.Request, res: app.Response) {
 		let u = await Usuario.cookie(req);
-		if (!u)
+		if (!u) {
 			res.redirect(app.root + "/acesso");
-		else
+		} else {
+			const anos = await Turma.anosTratadosPorUsuario(req, res, u.id);
+			if (!anos)
+				return;
+
 			res.render("turma/index", {
 				layout: "layout-sem-form",
 				titulo: "Minhas Turmas",
 				datatables: true,
 				usuario: u,
-				lista: await Turma.listarDeUsuario(u.id)
+				ano: anos.ano,
+				anos: anos.lista,
+				lista: await Turma.listarDeUsuario(anos.ano, u.id)
 			});
+		}
 	}
 }
 

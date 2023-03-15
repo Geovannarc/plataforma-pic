@@ -59,23 +59,6 @@ class AtividadeRoute {
 				lista: await Atividade.listar()
 			});
 	}
-
-    public static async aula(req: app.Request, res: app.Response) {
-		let u = await Usuario.cookie(req);
-		if (!u)
-			res.redirect(app.root + "/acesso");
-		else{
-            let id = parseInt(req.query["id"] as string);
-			res.render("atividade/aula", {
-				layout: "layout-sem-form",
-				datatables: true,
-				usuario: u,
-                id: id,
-				lista: await Atividade.listarDeatividade(id),
-                secao: secoes.lista
-			});
-        }
-	}
 }
 
 export = AtividadeRoute;

@@ -5,37 +5,12 @@ import Turma = require("../models/turma");
 import Usuario = require("../models/usuario");
 
 class IndexRoute {
-	@app.http.hidden()
-	private static async obterAnos(req: app.Request, res: app.Response, usuario: Usuario): Promise<{ ano: number, anos: number[] } | null> {
-		const anos = await Turma.anosPorUsuario(usuario.id);
-		if (!anos || !anos.length) {
-			res.render("index/erro", { layout: "layout-externo", mensagem: "Não foram encontradas atribuições do usuário a turmas" });
-			return null;
-		}
-
-		let ano = parseInt(req.query["ano"] as string) || (new Date()).getFullYear();
-		let encontrado = false;
-		for (let i = anos.length - 1; i >= 0; i--) {
-			if (anos[i] === ano) {
-				encontrado = true;
-				break;
-			}
-		}
-		if (!encontrado)
-			ano = anos[anos.length - 1];
-
-		return {
-			ano,
-			anos
-		};
-	}
-
 	public static async index(req: app.Request, res: app.Response) {
 		let u = await Usuario.cookie(req);
 		if (!u) {
 			res.redirect(app.root + "/login");
 		} else {
-			const anos = await IndexRoute.obterAnos(req, res, u);
+			const anos = await Turma.anosTratadosPorUsuario(req, res, u.id);
 			if (!anos)
 				return;
 
@@ -45,7 +20,7 @@ class IndexRoute {
 					titulo: "Dashboard",
 					usuario: u,
 					ano: anos.ano,
-					anos: anos.anos,
+					anos: anos.lista,
 					lista: await Turma.situacaoPorProfessor(anos.ano, u.id)
 				});
 			} else {
@@ -82,7 +57,7 @@ class IndexRoute {
 		if (!u) {
 			res.redirect(app.root + "/acesso");
 		} else {
-			const anos = await IndexRoute.obterAnos(req, res, u);
+			const anos = await Turma.anosTratadosPorUsuario(req, res, u.id);
 			if (!anos)
 				return;
 
@@ -98,7 +73,7 @@ class IndexRoute {
 						xlsx: true,
 						usuario: u,
 						ano: anos.ano,
-						anos: anos.anos,
+						anos: anos.lista,
 						notas: await Turma.notasAluno(anos.ano, u.id),
 						situacao
 					});
