@@ -2332,14 +2332,14 @@ window.prepareDatePicker = function (id, options) {
 
 	d = i$.datepicker(opt);
 
-	if (i$ && i$.length) {
+	if (i$.length) {
 		for (i = 0; i < i$.length; i++) {
 			i$[i].setAttribute("autocomplete", "off");
 			i$[i].setAttribute("spellcheck", "false");
 		}
 	}
 
-	$(id).mask("00/00/0000");
+	i$.mask("00/00/0000");
 
 	return d;
 };
