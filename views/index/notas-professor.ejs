@@ -1,0 +1,100 @@
+<div class="row">
+	<div class="col-lg-3 col-md-4 col-sm-6">
+		<div class="form-group">
+			<h3><label for="anoMatricula" class="mb-0">Ano</label></h3>
+			<select class="form-control" id="anoMatricula" onchange="Swal.wait(); window.location.href = '<%- root %>/notas?ano=' + $('#anoMatricula').val();">
+<%
+	for (let i = 0; i < anos.length; i++) {
+%>
+				<option value="<%- anos[i] %>" <%- ((ano === anos[i]) ? 'selected="selected"' : '') %>><%- anos[i] %></option>
+<%
+	}
+%>
+			</select>
+		</div>
+	</div>
+</div>
+
+<div id="tabelas"></div>
+
+<%- contentFor("scripts") %>
+<script type="text/javascript">
+	//<![CDATA[
+	"use strict";
+	let notas = <%- JSON.stringify(lista) %>;
+
+	function preparar() {
+
+		let html = '';
+		let aberto = false;
+
+        let turmas = [];
+        let idturmas = [];
+
+        for(let i = 0; i < notas.length; i++){
+            if(idturmas.indexOf(notas[i].idturma) < 0){
+                turmas.push({idturma: notas[i].idturma, nome: notas[i].turma });
+                idturmas.push(notas[i].idturma)
+            }
+        }
+
+        let alunosPorTurma = [];
+
+        for(let i = 0; i < idturmas.length; i++){
+            let alunos = notas.filter(nota => nota.idturma == idturmas[i])
+            alunosPorTurma.push(alunos)
+        }
+
+        let item;
+
+		for(let i = 0; i < idturmas.length; i++){
+			item = turmas[i];
+
+			if(i%2 == 0){
+				if (aberto)
+					html += '</div>';
+				aberto = true;
+				html += '<div class="row">';
+			}
+			html += `
+			<div class="col-sm-6">
+				<div class="card shadow mb-4">
+					<div class="card-header">
+						Notas - ${item.nome}
+					</div>
+					<div class="card-body px-0">
+					<table class="table table-flush table-striped table-hover" id="tabela${i}"></table>
+					</div>
+				</div>
+			</div>
+			`;
+		}
+
+		if (aberto)
+			html += '</div>';
+
+		document.getElementById("tabelas").innerHTML = html;
+
+		for(let i = 0; i<idturmas.length; i++){
+            console.log(alunosPorTurma)
+
+			prepareDataTable("tabela" + i, {
+				order: [[1, "asc"]],
+				deferRender: true,
+				columns: [
+                    { title: "Capítulo", "type": "number", data: "capitulo" },
+					{ title: "Atividade", render: encode, data: "atividade" },
+					{ title: "Nome", data: "nome" },
+					{ title: "Aprovado", render: encode, data: function (row) { return row.aprovado ? "Sim" : "Não"; }},
+					{ title: "Conclusão", "class": "col-min text-right", "type": "customdatetimeint", data: "conclusao" }
+				],
+				data: alunosPorTurma[i],
+				export: { xlsx: true, title: "Atividades - Turma " + item }
+			});
+		}
+	}
+
+	preparar();
+
+</script>
+

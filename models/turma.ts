@@ -25,6 +25,19 @@ interface Turma {
 	professores?: number[];
 }
 
+interface notasAlunoPorProfessor{
+	idturma: number;
+	idusuario: number;
+	idturma_usuario: number;
+	idatividade: number;
+	nota: number;
+	aprovado: boolean;
+	conclusao: string;
+	nome: string;
+	turma: string;
+	sala: string
+}
+
 interface SituacaoAtividadeTurmaProfessor {
 	nome: string;
 	serie: number;
@@ -155,6 +168,26 @@ class Turma {
 
 			return turma;
 		});
+	}
+
+	public static obterNotasAlunoPorProfessor(ano: number, idprofessor: number): Promise<notasAlunoPorProfessor[]>{
+		return app.sql.connect(async (sql) =>{
+			const lista: notasAlunoPorProfessor[] = await sql.query(`select tu.idturma, tu.idusuario, tu.id idturma_usuario, tua.idatividade, nota, aprovado, date_format(conclusao, '%d/%m/%Y') conclusao, u.nome, t.nome turma, t.sala,
+			a.nome atividade, a.capitulo, a.idsecao, a.ordem 
+			from turma_usuario tu
+			inner join 
+			(select ta.idturma from turma_usuario ta where ta.idusuario = ? and professor = 1) ts
+			on ts.idturma = tu.idturma
+			inner join turma t on t.id = tu.idturma
+			left join turma_atividade_liberada tal on tal.idturma = t.id
+			left join turma_usuario_atividade tua on tua.idturma_usuario = tu.id and tua.idatividade = tal.idatividade
+			inner join usuario u on u.id = tu.idusuario
+			inner join atividade a on a.id = tal.idatividade
+			where tu.professor = 0 and t.ano = ?
+			order by ts.idturma;`, [idprofessor, ano])
+
+			return lista;
+		} )
 	}
 
 	public static async criar(turma: Turma): Promise<string | number> {

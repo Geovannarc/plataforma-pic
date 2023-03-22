@@ -10,31 +10,40 @@ class IndexRoute {
 		if (!u) {
 			res.redirect(app.root + "/login");
 		} else {
-			const anos = await Turma.anosTratadosPorUsuario(req, res, u.id);
-			if (!anos)
-				return;
-
-			if (u.idperfil == Perfil.Professor || u.idperfil == Perfil.Administrador) {
+			if(u.idperfil == Perfil.Administrador){
 				res.render("index/index", {
 					layout: "layout-sem-form",
 					titulo: "Dashboard",
 					usuario: u,
-					ano: anos.ano,
-					anos: anos.lista,
-					lista: await Turma.situacaoPorProfessor(anos.ano, u.id)
+					lista: null //@@@ fazer outra query pra dash de admin
 				});
-			} else {
-				const situacao = await Turma.situacaoPorAlunoPorCapitulo(anos.ano, u.id);
-				if (!situacao) {
-					res.render("index/erro", { layout: "layout-externo", mensagem: "Não foi encontrada uma matrícula em uma turma no ano de " + anos.ano });
-				} else {
-					res.render("index/menu", {
-						layout: "layout-externo-sem-card",
+			}else{
+				const anos = await Turma.anosTratadosPorUsuario(req, res, u.id);
+				if (!anos)
+					return;
+
+				if (u.idperfil == Perfil.Professor) {
+					res.render("index/index", {
+						layout: "layout-sem-form",
+						titulo: "Dashboard",
 						usuario: u,
-						situacao,
-						atividades: await Turma.notasAluno(anos.ano, u.id),
-						liberadas: await Turma.liberadasPorTurma(anos.ano, u.id)
+						ano: anos.ano,
+						anos: anos.lista,
+						lista: await Turma.situacaoPorProfessor(anos.ano, u.id)
 					});
+				} else if(u.idperfil == Perfil.Aluno) {
+					const situacao = await Turma.situacaoPorAlunoPorCapitulo(anos.ano, u.id);
+					if (!situacao) {
+						res.render("index/erro", { layout: "layout-externo", mensagem: "Não foi encontrada uma matrícula em uma turma no ano de " + anos.ano });
+					} else {
+						res.render("index/menu", {
+							layout: "layout-externo-sem-card",
+							usuario: u,
+							situacao,
+							atividades: await Turma.notasAluno(anos.ano, u.id),
+							liberadas: await Turma.liberadasPorTurma(anos.ano, u.id)
+						});
+					}
 				}
 			}
 		}
@@ -79,8 +88,21 @@ class IndexRoute {
 					});
 				}
 			} else {
-				// @@@ relatório de notas do professor
-				res.render("index/erro", { layout: "layout-externo", mensagem: "Não implementado", erro: "Não implementado" });
+				const lista = await Turma.obterNotasAlunoPorProfessor(anos.ano, u.id);
+				if (!lista) {
+					res.render("index/erro", { layout: "layout-externo", mensagem: "Não foi encontrada uma matrícula em uma turma no ano de " + anos.ano });
+				} else {
+					res.render("index/notas-professor", {
+						layout: "layout-sem-form",
+						titulo: "Notas",
+						datatables: true,
+						xlsx: true,
+						usuario: u,
+						ano: anos.ano,
+						anos: anos.lista,
+						lista
+					});
+				}
 			}
 		}
 	}
