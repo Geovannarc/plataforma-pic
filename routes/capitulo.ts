@@ -29,7 +29,7 @@ class CapituloRoute {
             }else{
                 res.render("capitulo/erro", {
                     layout: "layout-sem-form",
-                    titulo: "Não encontrado",
+                    titulo: "Atividade indisponível",
                     usuario: u
                 });
             }

@@ -1,0 +1,115 @@
+<p class="pergunta mb-3" id="pergunta"></p>
+    <div class="row" id="alternativas">
+    </div>
+
+<script>
+    let selected = 0;
+
+    function bgColor(id){
+        element = document.getElementById(id)
+        if(element.style.backgroundColor == "white" || !element.style.backgroundColor){
+            element.style.backgroundColor = "#8bd38b"
+            $("#proximo").prop('disabled', false)
+            selected++
+        }else{
+            element.style.backgroundColor = "white"
+            if(selected > 0){
+                selected--
+            }
+            if(selected == 0){
+                $("#proximo").prop('disabled', true)
+            }
+        }
+    }
+
+    let perguntas = "Qual jogo Tito e seus amigos estão jogando?"
+    $(window).on("load",function(){
+        $('#pergunta').html(perguntas)
+        $('#alternativas').append(`
+            <div class="col-sm-8 py-0">
+                <img class="img-pergunta-2" src="<%-staticRoot%>/img/pergunta2.jpg" style="max-width: 100%;" alt="tito e garibaldi jogando xadrez"/>  
+            </div>
+            <div class="col-sm-4 text-center" style="align-self:center;">
+                <div class="alternativas mb-3 py-2" id="alt-1"  style="max-width: 100%;">DAMA</div>
+                <div class="alternativas mb-3 py-2" id="alt-2"  style="max-width: 100%;">DOMINÓ</div>
+                <div class="alternativas mb-3 py-2" id="alt-3"  style="max-width: 100%;">XADREZ</div>
+                <div class="alternativas mb-3 py-2" id="alt-4"  style="max-width: 100%;">MINECRAFT</div>
+            </div>
+            `)
+        $("#alt-1").on("click", function(){
+           bgColor('alt-1')
+        })
+        $("#alt-2").on("click", function(){
+            bgColor('alt-2')
+        })
+        $("#alt-3").on("click", function(){
+            bgColor('alt-3')
+        })
+        $("#alt-4").on("click", function(){
+            bgColor('alt-4')
+        })
+    } )
+
+    // $("#proximo").on("click", function(){
+    //     $('#pergunta').html(perguntas[1])
+    //     $("#alt-1").css("background-color", "white")
+    //     $("#alt-2").css("background-color", "white")
+    //     $("#alt-3").css("background-color", "white")
+    //     $("#alt-4").css("background-color", "white")
+    //     selected = 0;
+    // })
+
+    
+	$(() => { 
+        $("#proximo").on("click", function(){
+		if (JsonWebApi.active)
+			return;
+
+        let aprovado, nota;
+
+        let idturma = <%-lista.id%>;
+        let idatividade = <%-atividade%>;
+
+        if(selected){
+            nota = 10;
+            aprovado = 1
+        }else{
+            nota = 0;
+            aprovado = 0
+        }
+		Swal.wait();
+
+		JsonWebApi.post("<%- root %>/api/atividade/registrarTentativa", {
+			idturma,
+            idatividade,
+            nota,
+            aprovado
+		}, function (response) {
+			if (response.success) {
+				Swal.success("Atividade concluída com sucesso! " + emoji.happy);
+			} else {
+				Swal.error(response.value + " " + emoji.sad);
+			}
+		});
+	})})
+
+</script>
+<style>
+    .pergunta{
+        font-family: 'Yomogi', cursive;
+        text-align: center;
+        font-size: 1.4rem;
+        border-radius: 10px;
+        background-color: white;
+        padding: 10px;
+    }
+
+    .alternativas{
+        font-family: 'Yomogi', cursive;
+        background-color: white;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        cursor: pointer;
+    }
+</style>

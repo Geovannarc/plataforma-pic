@@ -1,0 +1,75 @@
+<div class="row">
+    <div class="col-sm-4">
+        <img class="img-pecas" src="<%-staticRoot%>/img/torre.png"/>
+        <img class="img-pecas mt-2" src="<%-staticRoot%>/img/peca1.png"/>
+    </div>
+    <div class="col-sm-4">
+        <img class="img-pecas" src="<%-staticRoot%>/img/bispo.png"/>
+        <img class="img-pecas mt-2" src="<%-staticRoot%>/img/peca5.png"/>
+    </div>
+    <div class="col-sm-4">
+        <img class="img-pecas" src="<%-staticRoot%>/img/cavalo.png"/>
+        <img class="img-pecas mt-2" src="<%-staticRoot%>/img/peca3.png"/>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-4">
+        <img class="img-pecas" src="<%-staticRoot%>/img/peao.png"/>
+        <img class="img-pecas mt-2" src="<%-staticRoot%>/img/peca6.png"/>
+    </div>
+    <div class="col-sm-4">
+        <img class="img-pecas" src="<%-staticRoot%>/img/rei.png"/>
+        <img class="img-pecas mt-2" src="<%-staticRoot%>/img/peca2.png"/>
+
+    </div>
+    <div class="col-sm-4">
+        <img class="img-pecas" src="<%-staticRoot%>/img/dama.png"/>
+        <img class="img-pecas mt-2" src="<%-staticRoot%>/img/peca4.png"/>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-8">
+        <img src="<%-staticRoot%>/img/tabuleiro.png" style="width: 100%;"/>
+    </div>
+    <div class="col-sm-4">
+        <h3>A dama está na coluna D e linha 4.</h3>
+        <h2>Logo, ela está na casa D4!</h2>
+    </div>
+</div>
+
+<style>
+    .img-pecas{
+        max-width: 5em;
+        display: block;
+        margin-right: auto;
+        margin-left: auto;
+    }
+</style>
+<script>
+$(() => { 
+    $('#proximo').attr('disabled', false)
+    $("#proximo").on("click", function(){
+    if (JsonWebApi.active)
+        return;
+
+    let aprovado = 1, nota = 10;
+    let idturma = <%-lista.id%>;
+    let idatividade = <%-atividade%>;
+
+    Swal.wait();
+
+    JsonWebApi.post("<%- root %>/api/atividade/registrarTentativa", {
+        idturma,
+        idatividade,
+        nota,
+        aprovado
+    }, function (response) {
+        if (response.success) {
+            Swal.success("Atividade concluída com sucesso! " + emoji.happy);
+        } else {
+            Swal.error(response.value + " " + emoji.sad);
+        }
+    });
+})})
+</script>

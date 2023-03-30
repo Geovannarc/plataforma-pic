@@ -1,0 +1,88 @@
+<div class="">
+    <div class="row">
+            <div class="col-lg-6 margin-top-18">
+            <img src="<%staticRoot%>/public/img/criancas.jpg" alt="crianças em sala" class="img">
+        </div>
+        <div class="col-lg-6">
+            <div class="texto margin-top-1" id="paragrafo2">
+                <p class="text-center">
+                Escreva o "endereço" da carteira de Caco indicando a linha e a coluna da sua posição no mapa de sala.
+                <br/><span style="color: #ef768b;">(Dica: Caco está usando uma camisa rosa.)</span>
+                </p>  
+            </div>
+            <div class="texto margin-top-1" id="paragrafo3">
+                <p class="text-center" style="display: inline;">
+                    Posição do Caco: 
+                </p>
+                <input type="text">
+            </div>
+        </div>
+        <button class="btn btn-success botao2 margin-top-1" id="botao2" style="display: none !important;" onclick="mudaPagina();">PRÓXIMO</button>
+        
+    </div>
+</div>
+
+<style>
+    
+    .margin-top-1{
+        margin-top: 1rem !important;
+    }
+
+    .texto{
+        font-size: 0.8rem;
+        font-family: 'Yomogi', cursive !important;
+        border: 2px solid #5987a8;
+        padding: 1rem;
+    }
+    
+    .botao2{
+        padding: 0.5rem !important;
+        font-size: 1.5rem !important;
+        width: 100%;
+    }
+
+    .centered{
+        margin-top: 17vh !important;
+    }
+
+    .margin-top-18{
+        margin-top: 18vh !important;
+    }
+
+    input{
+        font-size: 2rem;
+        width: 3rem;
+        display: inline;
+    }
+
+    .img{
+        max-width: 100%;
+    }
+</style>
+<script>
+    $(() => { 
+    $('#proximo').attr('disabled', false)
+    $("#proximo").on("click", function(){
+    if (JsonWebApi.active)
+        return;
+
+    let aprovado = 1, nota = 10;
+    let idturma = <%-lista.id%>;
+    let idatividade = <%-atividade%>;
+
+    Swal.wait();
+
+    JsonWebApi.post("<%- root %>/api/atividade/registrarTentativa", {
+        idturma,
+        idatividade,
+        nota,
+        aprovado
+    }, function (response) {
+        if (response.success) {
+            Swal.success("Atividade concluída com sucesso! " + emoji.happy);
+        } else {
+            Swal.error(response.value + " " + emoji.sad);
+        }
+    });
+})})
+</script>

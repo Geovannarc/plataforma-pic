@@ -1,0 +1,122 @@
+<div id="segundoEX">
+    <div class="row">
+        <div class="col-lg-8 image"> 
+        </div>
+        <div class="col-lg-4">
+            <p class="texto text-center">
+            Escreva as coordenadas das casas para as quais Tito e Garibaldi estão apontando.
+            </p> 
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <img src="<%-staticRoot%>/img/TITO.jpg" alt="Tito" class="img-icone">
+                        <input type="text" class="ex2" id="box1">
+                    </div>
+                    <div class="col-lg-6">
+                        <img src="<%-staticRoot%>/img/GARIBALDI.jpg" alt="Garibaldi" class="img-icone">
+                        <input type="text" class="ex2" id="box2">
+                    </div>
+                </div>
+                <div class="centered">
+                    <button id="validar" class="btn btn-success "><i class="fas fa-check fa"></i></i></button>
+                    <button class="btn btn-secondary" id="proximo2"><i class="fas fa-arrow-right fa"></i></i></button>
+                </div>
+            </div>
+        </div>
+    </div>               
+</div>
+
+<style>
+
+    .texto{
+        font-size: 1.3rem;
+        margin-top: 1rem;
+        font-family: 'Yomogi', cursive;
+    }
+
+input{
+    margin-top: 1rem;
+    width: 150px;
+    height: 3rem;
+}
+
+
+.btn{
+    margin-top: 2rem;
+    margin-right: 1rem;
+}
+
+.image{
+    background-image: url('../../../../public/img/tabuleiroex2.jpg');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position-x: center;
+    min-height: 100vh;
+}
+
+.img-icone{
+    width: 100%;
+    margin-top: 1em;
+}
+
+.ex2{
+    font-size: 2rem;
+}
+
+.centered{
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+</style>
+
+<script>
+    
+document.addEventListener('DOMContentLoaded', () => {
+
+    const validar = document.querySelector("#validar");
+    const box1 = document.querySelector("#box1");
+    const box2 = document.querySelector("#box2");
+    
+    validar.addEventListener('click', () => {
+        if(box1.value === 'b5' || box1.value === 'B5'){
+            box1.style.backgroundColor = 'green';
+        }else{
+            box1.style.backgroundColor = 'red';
+        }
+
+        if(box2.value === 'f3' || box2.value === 'F3'){
+            box2.style.backgroundColor = 'green';
+        }else{
+            box2.style.backgroundColor = 'red';
+        } 
+    })
+
+})
+
+$(() => { 
+    $("#proximo2").on("click", function(){
+    if (JsonWebApi.active)
+        return;
+
+    let aprovado = 1, nota = 10;
+    let idturma = <%-lista.id%>;
+    let idatividade = <%-atividade%>;
+
+    Swal.wait();
+
+    JsonWebApi.post("<%- root %>/api/atividade/registrarTentativa", {
+        idturma,
+        idatividade,
+        nota,
+        aprovado
+    }, function (response) {
+        if (response.success) {
+            Swal.success("Atividade concluída com sucesso! " + emoji.happy);
+        } else {
+            Swal.error(response.value + " " + emoji.sad);
+        }
+    });
+})})
+</script>

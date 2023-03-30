@@ -1,0 +1,29 @@
+<iframe width="100%"  src="https://www.youtube.com/embed/qZQ6RufjPo8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+<script>
+$(() => { 
+    $('#proximo').attr('disabled', false)
+    $("#proximo").on("click", function(){
+    if (JsonWebApi.active)
+        return;
+
+    let aprovado = 1, nota = 10;
+    let idturma = <%-lista.id%>;
+    let idatividade = <%-atividade%>;
+
+    Swal.wait();
+
+    JsonWebApi.post("<%- root %>/api/atividade/registrarTentativa", {
+        idturma,
+        idatividade,
+        nota,
+        aprovado
+    }, function (response) {
+        if (response.success) {
+            Swal.success("Atividade concluída com sucesso! " + emoji.happy);
+        } else {
+            Swal.error(response.value + " " + emoji.sad);
+        }
+    });
+})})
+</script>
