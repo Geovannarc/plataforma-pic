@@ -1,17 +1,17 @@
 <div class="">
     <div class="row">
-            <div class="col-lg-6 margin-top-18">
+            <div class="col-sm-6">
             <img src="<%staticRoot%>/public/img/criancas.jpg" alt="crianças em sala" class="img">
         </div>
-        <div class="col-lg-6">
-            <div class="texto margin-top-1" id="paragrafo2">
-                <p class="text-center">
+        <div class="col-sm-6">
+            <div class="margin-top-1 border-blue" id="paragrafo2">
+                <p class="texto text-center">
                 Escreva o "endereço" da carteira de Caco indicando a linha e a coluna da sua posição no mapa de sala.
                 <br/><span style="color: #ef768b;">(Dica: Caco está usando uma camisa rosa.)</span>
                 </p>  
             </div>
-            <div class="texto margin-top-1" id="paragrafo3">
-                <p class="text-center" style="display: inline;">
+            <div class="margin-top-1 border-blue" id="paragrafo3">
+                <p class="texto text-center" style="display: inline;">
                     Posição do Caco: 
                 </p>
                 <input type="text">
@@ -29,8 +29,10 @@
     }
 
     .texto{
-        font-size: 0.8rem;
         font-family: 'Yomogi', cursive !important;
+    }
+
+    .border-blue{
         border: 2px solid #5987a8;
         padding: 1rem;
     }
@@ -39,14 +41,6 @@
         padding: 0.5rem !important;
         font-size: 1.5rem !important;
         width: 100%;
-    }
-
-    .centered{
-        margin-top: 17vh !important;
-    }
-
-    .margin-top-18{
-        margin-top: 18vh !important;
     }
 
     input{

@@ -1,22 +1,19 @@
 <div id="primeiroEX">
     <div class="row">
-        <div class="col-sm-8">
-            <canvas id="board" style="max-width: 100%;">
+        <div class="col-sm-7 p-0">
+            <canvas id="board" style="max-width: 100%; max-height: 100%;">
             </canvas> 
         </div>
-        <div class="col-sm-4">
-            <p class="texto">
+        <div class="col-sm-5 p-0">
+            <p class="texto p-2 mt-4em">
             Pinte todas as casas das linhas pares no tabuleiro.
             </p> 
-            <div class="row">
-                <div class="col-sm-6">
-                    <input type="color" id="color" name="color" value="#ff0000">
-                    <button id="eraser" class="btn btn-danger"><i class="fas fa-undo-alt fa-3x"></i></button>
-                </div>
-                <div class="col-sm-6">
-                    <label for="color" class="text-center texto">Escolha a cor do pincel aqui!</label>
-                    <button id="proximo" class="btn btn-success"><i class="fas fa-check fa-3x"></i></i></button>
-                </div>
+            <div class="center p-2">
+                <input type="color" id="color" name="color" value="#000000" class="color-picker">                    
+                <label for="color" class="text-center texto-cursivo-pequeno d-inline centered m-0">Escolha a cor do pincel aqui!</label>
+            </div>
+            <div class="text-center mt-1 mb-4em">
+                <button id="eraser" class="btn btn-danger mt-0"><i class="fas fa-undo-alt"></i></button>
             </div>
         </div>
     </div>               
@@ -36,53 +33,74 @@
         background-size: contain;
         background-position-x: center;
         display: inline;
+        cursor: url("../../../../public/img/pen-cursor.svg") 16 16, pointer;
     }
 
-canvas{
-    height: 100%;
-}
+    .centered{
+        align-self: center;
+    }
 
-input{
-    margin: 1rem;
-    width: 150px;
-    height: 3rem;
-}
+    .mt-4em{
+        margin-top: 4em;
+    }
 
-.swal2-popup {
-    font-size: 1.6rem !important;
-}
+    .mb-4em{
+        margin-bottom: 4em;
+    }
 
-.texto{
-    font-size: 1.3rem;
-    margin-top: 1rem;
-    font-family: 'Yomogi', cursive;
-}
 
-#eraser{
-    display: inline;
-    margin-right: 1rem;
-}
+    canvas{
+        height: 100%;
+    }
 
-.btn{
-    margin-top: 2rem;
-    margin-right: 1rem;
-}
+    .center{
+        align-self: center;
+        display: flex;
+    }
 
-.image{
-    background-image: url('.../img/tabuleiroex2.jpg');
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position-x: center;
-    min-height: 100vh;
-}
+    .color-picker{
+        appearance: none;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        background: none;
+        border: 0;
+        cursor: pointer;
+        height: 2.5em;
+        padding: 0;
+        width: 2.5em;
+        margin-right: 0.25em;
+    }
 
-.img-icone{
-    width: -webkit-fill-available;
-}
+    .texto-cursivo-pequeno{
+        font-size: 0.6em;
+        font-family: 'Yomogi', cursive;
+    }
 
-.ex2{
-    font-size: 2rem;
-}
+    .texto{
+        font-size: 1em;
+        font-family: 'Yomogi', cursive;
+    }
+
+    #eraser{
+        display: inline;
+        margin-right: 0.5em;
+    }
+
+    .image{
+        background-image: url('.../img/tabuleiroex2.jpg');
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position-x: center;
+        min-height: 100vh;
+    }
+
+    .img-icone{
+        width: -webkit-fill-available;
+    }
+
+    .ex2{
+        font-size: 2rem;
+    }
 
 </style>
 <script>
@@ -99,19 +117,29 @@ input{
 
     const context = board.getContext('2d');
 
-    board.width = 800
-    board.height = 800 
+    function getHeight(){
+        return document.querySelector("#board").clientHeight
+    }
+
+    function getWidth(){
+        return document.querySelector("#board").clientWidth
+    }
+
+    board.width = getWidth()
+    board.height = getHeight()
 
     context.lineWidth = 3;
     color.addEventListener('change', ()=>{
         context.globalCompositeOperation = 'source-over';
         context.strokeStyle = color.value;
+        board.style.cursor = `url("../../../../public/img/pen-cursor.svg") 16 16, pointer`;
     })
     
     const eraser = document.querySelector("#eraser");
     eraser.addEventListener('click', () => {
         context.globalCompositeOperation = 'source-out';
         context.strokeStyle = 'rgba(1,0,0,0)';
+        board.style.cursor = `url("../../../../public/img/undo-cursor.svg") 16 16, pointer`;
     })
     
     const desenharLinha = (linha) => {

@@ -25,7 +25,7 @@ interface Turma {
 	professores?: number[];
 }
 
-interface notasAlunoPorProfessor{
+interface NotasAlunoPorProfessor{
 	idturma: number;
 	idusuario: number;
 	idturma_usuario: number;
@@ -170,9 +170,9 @@ class Turma {
 		});
 	}
 
-	public static obterNotasAlunoPorProfessor(ano: number, idprofessor: number): Promise<notasAlunoPorProfessor[]>{
+	public static obterNotasAlunoPorProfessor(ano: number, idprofessor: number): Promise<NotasAlunoPorProfessor[]>{
 		return app.sql.connect(async (sql) =>{
-			const lista: notasAlunoPorProfessor[] = await sql.query(`select tu.idturma, tu.idusuario, tu.id idturma_usuario, tua.idatividade, nota, aprovado, date_format(conclusao, '%d/%m/%Y') conclusao, u.nome, t.nome turma, t.sala,
+			const lista: NotasAlunoPorProfessor[] = await sql.query(`select tu.idturma, tu.idusuario, tu.id idturma_usuario, tua.idatividade, nota, aprovado, date_format(conclusao, '%d/%m/%Y') conclusao, u.nome, t.nome turma, t.sala,
 			a.nome atividade, a.capitulo, a.idsecao, a.ordem 
 			from turma_usuario tu
 			inner join 

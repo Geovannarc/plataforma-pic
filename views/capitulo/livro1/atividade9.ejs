@@ -1,9 +1,8 @@
-<div class="">
-    <div class="row">
-        <div class="col-sm-10">
-            <div class="grid">
-                <div class="container">
-                    <div class="row">
+<div class="row">
+        <div class="col-sm-9">
+            <div class="grid text-center">
+                <div class="container p-0">
+                    <div class="row max-width">
                         <div class="col-sm-2 height">
                             <p class="text-center bold">8</p>
                         </div>
@@ -32,7 +31,7 @@
                             
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row max-width">
                         <div class="col-sm-2  height">
                             <p class="text-center bold">7</p>
                         </div>
@@ -61,7 +60,7 @@
                             
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row max-width">
                         <div class="col-sm-2 height">
                             <p class="text-center bold">6</p>
                         </div>
@@ -90,7 +89,7 @@
                             
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row max-width">
                         <div class="col-sm-2  height">
                             <p class="text-center bold">5</p>
                         </div>
@@ -119,7 +118,7 @@
                             
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row max-width">
                         <div class="col-sm-2 height">
                             <p class="text-center bold">4</p>
                         </div>
@@ -148,7 +147,7 @@
                             
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row max-width">
                         <div class="col-sm-2  height">
                             <p class="text-center bold">3</p>
                         </div>
@@ -177,7 +176,7 @@
                             
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row max-width">
                         <div class="col-sm-2 height">
                         <p class="text-center bold">2</p>
                         </div>
@@ -206,7 +205,7 @@
                             
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row max-width">
                         <div class="col-sm-2  height">
                             <p class="text-center bold">1</p>
                         </div>
@@ -236,7 +235,7 @@
                         </div>
 
                     </div>
-                    <div class="row">
+                    <div class="row max-width">
                         <div class="col-sm-2">
                         </div>
                         <div class="col-sm-1 ">
@@ -267,7 +266,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-2">
+        <div class="col-sm-3 p-0">
             <div class="computerPlayer">
                 <p class="texto">Computador</p>
                 <div id="computerLives">
@@ -286,15 +285,7 @@
                     
                 </div>
             </div>
-            <div id="playerPoints">
-                <div id="humanPieces" class="playerPoints">
-                    
-                </div>
-                <div id="shoot-container">
-                    <input type="text" id="shoot">
-                    <button class="btn btn-success" style="font-size: 0.5em;"><a onclick="humanShot()">ATIRAR</a></button>
-                </div>
-                <p class="texto playerPoints">Você</p>
+            <div id="playerPoints"><p class="texto playerPoints">Você</p>
                 <div id="humanLives" class="playerPoints">
                     <i class="fas fa-heart fa" style="color: rgb(192, 23, 23)"></i>
                     <i class="fas fa-heart fa" style="color: rgb(192, 23, 23)"></i>
@@ -303,17 +294,24 @@
                     <i class="fas fa-heart fa" style="color: rgb(192, 23, 23)"></i>
                     <i class="fas fa-heart fa" style="color: rgb(192, 23, 23)"></i>
                 </div>
+                <div id="humanPieces" class="playerPoints">
+                    
+                </div>
+                <div id="shoot-container">
+                    <input type="text" id="shoot">
+                    <button class="btn btn-success" style="font-size: 0.5em;"><a onclick="humanShot()">ATIRAR</a></button>
+                </div>
             </div>    
         </div>
     </div>
-</div>
+
 
 <style>
 
 
     .bold{
         font-weight: 600;
-        font-size: 2rem;
+        font-size: 1rem;
         margin-top: 1rem;
     }
 
@@ -323,7 +321,7 @@
 
     .max-width{
         max-width: 100%;
-        max-height: 100%;
+        max-height: 2em;
     }
 
     #computerPlay{
@@ -345,8 +343,8 @@
     .black{
         background-color: black;
     }
-    #humanPieces{
-        margin-top: 30vh;
+    #playerPoints{
+        margin-top: 5em;
     }
 
     .texto{
@@ -364,17 +362,7 @@
         text-align: center;
         position: relative;
         vertical-align: middle;
-        padding: 0.5em;
-    }
-
-    .computerPlayer{
-        left: -200px;
-        position: relative;
-    }
-
-    .playerPoints{
-        left: -200px;
-        position: relative;
+        padding: 0.2em;
     }
 
     #computerLives{
@@ -383,11 +371,6 @@
 
     #humanLives{
         display: flex;
-    }
-
-    #shoot-container{
-        left: -200px;
-        position: relative;
     }
 
     #shoot{
@@ -501,7 +484,7 @@ const createHumanBoard = () => {
         img1.setAttribute("src", `${whitesShuffled[i]}`);
         whitesBoard[i].appendChild(img1);
         img1.style.maxWidth = "100%";
-        img1.style.height = "100%";
+        img1.style.maxHeight = "2em";
     }
 }
 
@@ -512,7 +495,7 @@ const createComputerBoard = () => {
         img1.setAttribute("src", "<%-root%>/public/img/verso.png");
         blacksBoard[i].appendChild(img1);
         img1.style.maxWidth = "100%";
-        img1.style.height = "100%";
+        img1.style.maxHeight = "2em";
     }
 }
 
@@ -625,7 +608,7 @@ const shoot = (i) => {
         img1.setAttribute("src", `${blacksShuffled[i]}`);
         blacksBoard[i].innerHTML = "";
         blacksBoard[i].appendChild(img1);
-        img1.style.height = "100%";
+        img1.style.height = "2em";
         img1.style.maxWidth = "100%";
         if (!cardsWonByHuman.includes(blacksShuffled[i])) {
             cardsWonByHuman.push(blacksShuffled[i]);
@@ -733,10 +716,6 @@ const endGame = () => {
                     backdrop: `
                         rgba(0,0,123,0.1)
                     `
-                    }).then((result) => {
-                        if(result.isConfirmed){
-                            window.close();
-                        }
                     })
             }
         })

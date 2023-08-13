@@ -32,7 +32,7 @@ class IndexRoute {
 						lista: await Turma.situacaoPorProfessor(anos.ano, u.id)
 					});
 				} else if(u.idperfil == Perfil.Aluno) {
-					const situacao = await Turma.situacaoPorAlunoPorCapitulo(anos.ano, u.id);
+					const situacao = await Turma.situacaoPorAluno(anos.ano, u.id);
 					if (!situacao) {
 						res.render("index/erro", { layout: "layout-externo", mensagem: "Não foi encontrada uma matrícula em uma turma no ano de " + anos.ano });
 					} else {
